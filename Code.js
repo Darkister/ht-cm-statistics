@@ -1,3 +1,6 @@
+var validPhases = ["Purification 1","Jormag","Primordus","Kralkatorrik","Zeitzauberer der Leere","Purification 2","Mordremoth","Zhaitan","Void Saltspray Dragon","Purification 3","Soo-Won 1","Purification 4","Soo-Won 2"];
+var targetValues = ["Heart 1","The JormagVoid","The PrimordusVoid","The KralkatorrikVoid","Zeitzauberer der Leere","Heart 2","The MordremothVoid","The ZhaitanVoid","Void Saltspray Dragon","Heart 3","The SooWonVoid","Heart 4"];
+
 function apiFetch(permalink) {
   var opt = {
     contentType: "application/json",
@@ -18,8 +21,8 @@ function apiFetch(permalink) {
 function writeDataIntoSpreadsheet(){
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var sheet = ss.getSheetByName('Logs');
-  var startRow = 2;
-  var logs = sheet.getRange(startRow,2,sheet.getLastRow()-1,1).getValues();
+  var startRow = 200;
+  var logs = sheet.getRange(startRow,2,sheet.getLastRow()-startRow+1,1).getValues();
 
   for(var i = 0; i < logs.length; i++){
     var valuesRange = sheet.getRange(i+startRow,3,1,15);
@@ -78,13 +81,17 @@ function fightDuration(json){
  */
 function endPhase(json){
   var phases = json.phases;
-  var phase = phases[phases.length - 1].name
-  var validPhases = ["Purification 1","Jormag","Primordus","Kralkatorrik","Zeitzauberer der Leere","Purification 2","Mordremoth","Zhaitan","Leere-Salzgischtdrachen","Purification 3","SooWon"];
+  var phase = phases[phases.length - 1].name;
+  return getLatestValidPhase(phases)
+}
+
+function getLatestValidPhase(phases){
+  var phase = phases[phases.length -1].name;
   if(validPhases.includes(phase)){
     return phase;
   }
   else{
-    return phases[phases.length - 2].name;
+    return getLatestValidPhase(phases.slice(0,phases.length -1));
   }
 }
 
@@ -97,35 +104,44 @@ function endPhase(json){
  */
 function bossHPendPhase(json, boss){
   var targets = json.targets;
-  var targetValues = ["Heart 1","The JormagVoid","The PrimordusVoid","The KralkatorrikVoid","Zeitzauberer der Leere","Heart 2","The MordremothVoid","The ZhaitanVoid","The SooWonVoid"];
   var searchName = "";
   if(boss == "Purification 1"){
-    searchName = "Heart 1";
+    searchName = targetValues[0];
   }
   else if(boss == "Jormag"){
-    searchName = "The JormagVoid";
+    searchName = targetValues[1];
   }
   else if(boss == "Primordus"){
-    searchName = "The PrimordusVoid";
+    searchName = targetValues[2];
   }
   else if(boss == "Kralkatorrik"){
-    searchName = "The KralkatorrikVoid";
+    searchName = targetValues[3];
   }
   else if(boss == "Zeitzauberer der Leere"){
-    searchName = "Zeitzauberer der Leere";
+    searchName = targetValues[4];
   }
   else if(boss == "Purification 2"){
-    searchName = "Heart 2";
+    searchName = targetValues[5];
   }
   else if(boss == "Mordremoth"){
-    searchName = "The MordremothVoid";
+    searchName = targetValues[6];
   }
   else if(boss == "Zhaitan"){
-    searchName = "The ZhaitanVoid";
+    searchName = targetValues[7];
   }
-  else if(boss == "SooWon"){
-    searchName = "The SooWonVoid";
+  else if(boss == "Salzgischtdrache der Leere"){
+    searchName = targetValues[8];
   }
+  else if(boss == "Purification 3"){
+    searchName = targetValues[9];
+  }
+  else if(boss == "Soo-Won"){
+    searchName = targetValues[10];
+  }
+  else if(boss == "Purification 4"){
+    searchName = targetValues[10];
+  }
+
   for(var i = 0; i < targets.length; i++){
     if(targets[i].name == searchName){
       return (100 - targets[i].healthPercentBurned) / 100;
@@ -151,7 +167,7 @@ function isValid(json){
  * Get Accountname of first death player for given Encounter
  *
  * @param {String} json - fightData as json of the Encounter
- * * @return {String} - returns the first death player of the given fight
+ * @return {String} - returns the first death player of the given fight
  */
 function firstDeath(json){
   var mechanics = json.mechanics;
@@ -186,35 +202,50 @@ function getPlayer(json){
 
 /**
  * Checks given list of data for the best try
+ * Made some logger comments for debugging
  *
- * @param {any[][]} data - fightData as json of the Encounter
+ * @param {any[][]} data - List of Encounter results which contains the endBossphase + RestHP
  * @return {String} - returns the link to the best try
  * @customfunction
  */
 function getBestTry(data){
-  var targets =  ["Purification 1","Jormag","Primordus","Kralkatorrik","Zeitzauberer der Leere","Purification 2","Mordremoth","Zhaitan","SooWon"];
   var phaseNoCurr = 0;
   var bestPercCurr = 0;
   var bestTryCurr = 0;
 
+  Logger.log('Start checking best try.');
+
   for(var i = 0; i < data.length; i++){
-    var phaseNoCheck = 0;
-    var bestPercCheck = data[i][1];
-    for(var p = 0; p < targets.length; p++){
-      if(data[i][0] == targets[p]){
-        phaseNoCheck = p;
+  //  Logger.log('Current Try to check: EndPhase = ' + data[i][0] + ' with RestHP = ' +  data[i][1]);
+    var phaseNoToCheck = 0;
+    var bestPercToCheck = data[i][1];
+    for(var p = 0; p < validPhases.length; p++){
+      if(data[i][0] == validPhases[p]){
+        phaseNoToCheck = p;
+  //      Logger.log('This Phase Number is: ' + phaseNoToCheck);
+        break;
       }
     }
 
-    if(phaseNoCurr = phaseNoCheck){
-      if(bestPercCurr > bestPercCheck){
-        bestPercCurr = bestPercCheck;
+    if(phaseNoCurr == phaseNoToCheck){
+  //    Logger.log('This try ends in same phase as current best one.');
+      if(bestPercCurr > bestPercToCheck){
+  //      Logger.log('This try end with less Percent then current best one. Overwrite current best try. EndPhase = ' + data[i][0] + ' with RestHP = ' +  data[i][1]);
+        bestPercCurr = bestPercToCheck;
         bestTryCurr = i;
       }
+      else{
+  //      Logger.log('Skip this try.');
+      }
     }
-    else if(phaseNoCurr < phaseNoCheck){
-      phaseNoCurr = phaseNoCheck;
+    else if(phaseNoCurr < phaseNoToCheck){
+  //    Logger.log('This try is better then the current one. Overwrite current best try. EndPhase = ' + data[i][0] + ' with RestHP = ' +  data[i][1]);
+      phaseNoCurr = phaseNoToCheck;
+      bestPercCurr = bestPercToCheck;
       bestTryCurr = i;
+    }
+    else{
+  //    Logger.log('Skip this try.');
     }
   }
   var ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -224,7 +255,3 @@ function getBestTry(data){
 
   return logs[bestTryCurr][0]
 }
-
-
-
-
