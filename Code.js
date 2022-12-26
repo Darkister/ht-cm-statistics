@@ -1,31 +1,19 @@
 var validPhases = ["Purification 1","Jormag","Primordus","Kralkatorrik","Zeitzauberer der Leere","Purification 2","Mordremoth","Zhaitan","Void Saltspray Dragon","Purification 3","Soo-Won 1","Purification 4","Soo-Won 2"];
 var targetValues = ["Heart 1","The JormagVoid","The PrimordusVoid","The KralkatorrikVoid","Zeitzauberer der Leere","Heart 2","The MordremothVoid","The ZhaitanVoid","Void Saltspray Dragon","Heart 3","The SooWonVoid","Heart 4"];
 
-function apiFetch(permalink) {
-  var opt = {
-    contentType: "application/json",
-    muteHttpExceptions: true
-  };
-
-  var data = UrlFetchApp.fetch('https://dps.report/getJson?permalink=' + permalink, opt);
-  data = data.getContentText();
-
-  return JSON.parse(data);
-}
-
 /**
- * Get data of a log
- *
- * @param {String} link - permalink of the Encounter
+ * Write Data of the Log into the Spreadsheet
  */
 function writeDataIntoSpreadsheet(){
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var sheet = ss.getSheetByName('Logs');
-  var startRow = 200;
+  var startRow = 2;
   var logs = sheet.getRange(startRow,2,sheet.getLastRow()-startRow+1,1).getValues();
+  var date = "";
+  var cellsWithSameDate = 0;
 
   for(var i = 0; i < logs.length; i++){
-    var valuesRange = sheet.getRange(i+startRow,3,1,15);
+    var valuesRange = sheet.getRange(i+startRow,1,1,17);
     var values = valuesRange.getValues();
 
     try{
@@ -33,6 +21,28 @@ function writeDataIntoSpreadsheet(){
       Logger.log("Next Log to calculate: " + log);
       var json = apiFetch(log);
       var column = 0;
+      var dateOfLog = getDayOfLog(json);
+      if(date == ""){
+        date = dateOfLog;
+        values[0][column] = dateOfLog;
+        cellsWithSameDate++;
+      }
+      else if(date != dateOfLog){
+        date = dateOfLog;
+        values[0][column] = dateOfLog;
+        cellsWithSameDate = 1;
+      }
+      else if(date == dateOfLog){
+        if(!valuesRange.isPartOfMerge()){
+          sheet.getRange(i+startRow-cellsWithSameDate,1,cellsWithSameDate+1,1).mergeVertically();
+          cellsWithSameDate++;
+        }
+        else{
+          cellsWithSameDate++;
+        }
+      }
+      column++;
+      column++;
       values[0][column] = fightDuration(json);
       column++;
       var endphase = endPhase(json);
@@ -54,12 +64,32 @@ function writeDataIntoSpreadsheet(){
       console.error('apiFetch yielded error: ' + e);
       Logger.log('Continue with Dummy data');
       for (var c = 0; c < values[0].length; c++) {
-        values[0][c] = i + " / " + c;
+        if(c != 1){
+          values[0][c] = i + " / " + c;
+        }
       }
     }
 
     valuesRange.setValues(values);
   }
+}
+
+/**
+ * Get data of a log as json
+ *
+ * @param {String} link - permalink of the Encounter
+ * @return {String} - returns the full encounterinformation as json
+ */
+function apiFetch(permalink) {
+  var opt = {
+    contentType: "application/json",
+    muteHttpExceptions: true
+  };
+
+  var data = UrlFetchApp.fetch('https://dps.report/getJson?permalink=' + permalink, opt);
+  data = data.getContentText();
+
+  return JSON.parse(data);
 }
 
 /**
@@ -202,7 +232,6 @@ function getPlayer(json){
 
 /**
  * Checks given list of data for the best try
- * Made some logger comments for debugging
  *
  * @param {any[][]} data - List of Encounter results which contains the endBossphase + RestHP
  * @return {String} - returns the link to the best try
@@ -216,36 +245,25 @@ function getBestTry(data){
   Logger.log('Start checking best try.');
 
   for(var i = 0; i < data.length; i++){
-  //  Logger.log('Current Try to check: EndPhase = ' + data[i][0] + ' with RestHP = ' +  data[i][1]);
     var phaseNoToCheck = 0;
     var bestPercToCheck = data[i][1];
     for(var p = 0; p < validPhases.length; p++){
       if(data[i][0] == validPhases[p]){
         phaseNoToCheck = p;
-  //      Logger.log('This Phase Number is: ' + phaseNoToCheck);
         break;
       }
     }
 
     if(phaseNoCurr == phaseNoToCheck){
-  //    Logger.log('This try ends in same phase as current best one.');
       if(bestPercCurr > bestPercToCheck){
-  //      Logger.log('This try end with less Percent then current best one. Overwrite current best try. EndPhase = ' + data[i][0] + ' with RestHP = ' +  data[i][1]);
         bestPercCurr = bestPercToCheck;
         bestTryCurr = i;
       }
-      else{
-  //      Logger.log('Skip this try.');
-      }
     }
     else if(phaseNoCurr < phaseNoToCheck){
-  //    Logger.log('This try is better then the current one. Overwrite current best try. EndPhase = ' + data[i][0] + ' with RestHP = ' +  data[i][1]);
       phaseNoCurr = phaseNoToCheck;
       bestPercCurr = bestPercToCheck;
       bestTryCurr = i;
-    }
-    else{
-  //    Logger.log('Skip this try.');
     }
   }
   var ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -254,4 +272,62 @@ function getBestTry(data){
   var logs = sheet.getRange(startRow,2,sheet.getLastRow()-1,1).getValues();
 
   return logs[bestTryCurr][0]
+}
+
+/**
+ * Get the Day  where the try was made
+ *
+ * @param {String} json - fightData as json of the Encounter
+ * @return {String} - returns a date
+ */
+function getDayOfLog(json){
+  var timeStart = json.timeStart;
+  var date = timeStart.split("-");
+  var year = date[0];
+  var month = date[1];
+  var day = date[2].split(" ")[0];
+  return day + "." + month + "." + year
+}
+
+/**
+ * Calculate amount of failes with the given conditions
+ *
+ * @param {String} date
+ * @param {String} phase
+ * @return {Integer} - returns a number
+ * 
+ * @customfunction
+ */
+function getAmountOfFailes(date,phase){
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName('Logs');
+  var phaseValues = sheet.getRange(2,4,sheet.getLastRow(),1).getValues();
+  var dateValues = sheet.getRange(2,1,sheet.getLastRow(),1).getValues();
+  var counter = 0;
+  var lastValidDate = "";
+
+  Logger.log("Start counting ...: " + date.valueOf() + " " + phase);
+  Logger.log(dateValues);
+
+  if(date == "Over All"){
+    for(var a = 0; a < phaseValues.length; a++){
+      if(phaseValues[a][0] == phase){
+        counter++;
+      }
+    }
+  }
+  else{
+    for(var i = 0; i < phaseValues.length; i++){
+      Logger.log(dateValues[i][0]);
+      if(dateValues[i][0] != ""){
+        lastValidDate = dateValues[i][0].valueOf();
+        Logger.log("new last valid date = " + lastValidDate.valueOf());
+      }
+      if(phaseValues[i][0] == phase && date.valueOf() == lastValidDate.valueOf()){
+        counter++;
+      }
+    }
+  }
+
+  return counter;
 }
