@@ -13,7 +13,7 @@ function writeDataIntoSpreadsheet(){
   var cellsWithSameDate = 0;
 
   for(var i = 0; i < logs.length; i++){
-    var valuesRange = sheet.getRange(i+startRow,1,1,17);
+    var valuesRange = sheet.getRange(i+startRow,1,1,18);
     var values = valuesRange.getValues();
 
     try{
@@ -59,6 +59,7 @@ function writeDataIntoSpreadsheet(){
         values[0][column] = players[p];
         column++;
       }
+      values[0][column] = failedOnGreen(json);
     }
     catch(e){
       console.error('apiFetch yielded error: ' + e);
@@ -231,51 +232,7 @@ function getPlayer(json){
 }
 
 /**
- * Checks given list of data for the best try
- *
- * @param {any[][]} data - List of Encounter results which contains the endBossphase + RestHP
- * @return {String} - returns the link to the best try
- * @customfunction
- */
-function getBestTry(data){
-  var phaseNoCurr = 0;
-  var bestPercCurr = 0;
-  var bestTryCurr = 0;
-
-  Logger.log('Start checking best try.');
-
-  for(var i = 0; i < data.length; i++){
-    var phaseNoToCheck = 0;
-    var bestPercToCheck = data[i][1];
-    for(var p = 0; p < validPhases.length; p++){
-      if(data[i][0] == validPhases[p]){
-        phaseNoToCheck = p;
-        break;
-      }
-    }
-
-    if(phaseNoCurr == phaseNoToCheck){
-      if(bestPercCurr > bestPercToCheck){
-        bestPercCurr = bestPercToCheck;
-        bestTryCurr = i;
-      }
-    }
-    else if(phaseNoCurr < phaseNoToCheck){
-      phaseNoCurr = phaseNoToCheck;
-      bestPercCurr = bestPercToCheck;
-      bestTryCurr = i;
-    }
-  }
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var sheet = ss.getSheetByName('Logs');
-  var startRow = 2;
-  var logs = sheet.getRange(startRow,2,sheet.getLastRow()-1,1).getValues();
-
-  return logs[bestTryCurr][0]
-}
-
-/**
- * Get the Day  where the try was made
+ * Get the Day where the try was made
  *
  * @param {String} json - fightData as json of the Encounter
  * @return {String} - returns a date
@@ -290,44 +247,43 @@ function getDayOfLog(json){
 }
 
 /**
- * Calculate amount of failes with the given conditions
+ * Get info that try failed on green mechanic
+ * This function is very experimental
  *
- * @param {String} date
- * @param {String} phase
- * @return {Integer} - returns a number
- * 
- * @customfunction
+ * @param {String} json - fightData as json of the Encounter
+ * @return {Boolean} - returns a date
  */
-function getAmountOfFailes(date,phase){
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var sheet = ss.getSheetByName('Logs');
-  var phaseValues = sheet.getRange(2,4,sheet.getLastRow(),1).getValues();
-  var dateValues = sheet.getRange(2,1,sheet.getLastRow(),1).getValues();
-  var counter = 0;
-  var lastValidDate = "";
-
-  Logger.log("Start counting ...: " + date.valueOf() + " " + phase);
-  Logger.log(dateValues);
-
-  if(date == "Over All"){
-    for(var a = 0; a < phaseValues.length; a++){
-      if(phaseValues[a][0] == phase){
-        counter++;
+function failedOnGreen(json){
+  var mechanics = json.mechanics;
+  var downs;
+  try{
+    for(var i = 0; i < mechanics.length; i++){
+      if(mechanics[i].name == "Downed"){
+        downs = mechanics[i];
+        break;
       }
     }
-  }
-  else{
-    for(var i = 0; i < phaseValues.length; i++){
-      Logger.log(dateValues[i][0]);
-      if(dateValues[i][0] != ""){
-        lastValidDate = dateValues[i][0].valueOf();
-        Logger.log("new last valid date = " + lastValidDate.valueOf());
+
+    var time = 0;  
+    var timesAmount = 0;
+    for(var t = 0; t < downs.mechanicsData.length; t++){
+      if(downs.mechanicsData[t].time != time){
+        time = downs.mechanicsData[t].time;
+        timesAmount = 1;
       }
-      if(phaseValues[i][0] == phase && date.valueOf() == lastValidDate.valueOf()){
-        counter++;
+      else if(downs.mechanicsData[t].time == time){
+        timesAmount++;
       }
     }
-  }
 
-  return counter;
+    var amountOverNine = false;
+    if(timesAmount > 8){
+      amountOverNine = true;
+    }
+  
+    return amountOverNine;
+  }
+  catch{ 
+    return false;
+  }
 }
