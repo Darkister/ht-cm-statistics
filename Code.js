@@ -2,12 +2,53 @@ var validPhases = ["Purification 1","Jormag","Primordus","Kralkatorrik","Zeitzau
 var targetValues = ["Heart 1","The JormagVoid","The PrimordusVoid","The KralkatorrikVoid","Zeitzauberer der Leere","Heart 2","The MordremothVoid","The ZhaitanVoid","Void Saltspray Dragon","Heart 3","The SooWonVoid","Heart 4"];
 
 /**
- * Write Data of the Log into the Spreadsheet
+ * @param {*} e 
  */
-function writeDataIntoSpreadsheet(){
+function editTrigger(e) {
+  
+  var targetCol = 2;
+  var targetSheet = "Logs";
+  var inputIsValid = false;
+  var inputIsEmpty = false;
+  var values = e.range.getValues();
+  Logger.log(values);
+
+  for(var i = 0; i < values.length; i++){
+    if(values[i][0].toString().includes('https://dps.report/')){
+      inputIsValid = true;
+    }
+    else{
+      if(values[i][0].toString() == ""){
+        inputIsEmpty = true;
+      }
+      else{
+        inputIsValid = false;
+        break;
+      }
+    }
+  }
+
+  if (e && e.range && e.range.getRow() && e.range.getColumn() === targetCol && e.range.getSheet().getName() === targetSheet && inputIsValid) {
+    writeDataIntoSpreadsheet(e.range.getRow());
+  }
+  else if(e && e.range && e.range.getRow() && e.range.getColumn() === targetCol && e.range.getSheet().getName() === targetSheet && inputIsEmpty){
+    var range = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(targetSheet).getRange(e.range.getRow(),e.range.getColumn()-1,1,25);
+    range.clearContent();
+  }
+  else if(e && e.range && e.range.getRow() && e.range.getColumn() === targetCol && e.range.getSheet().getName() === targetSheet){
+    var cell = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(targetSheet).getRange(e.range.getRow(),e.range.getColumn() + 1);
+    cell.setValue("Wrong records found, check the entries or contact an admin");
+  }
+}
+
+/**
+ * Write Data of the Log into the Spreadsheet
+ * @param {Integer} row - [OPTIONAL] defines where to start with the data writing
+ */
+function writeDataIntoSpreadsheet(row=2){
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var sheet = ss.getSheetByName('Logs');
-  var startRow = 2;
+  var startRow = row;
   var logs = sheet.getRange(startRow,2,sheet.getLastRow()-startRow+1,1).getValues();
   var date = "";
   var cellsWithSameDate = 0;
