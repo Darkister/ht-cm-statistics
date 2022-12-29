@@ -163,7 +163,6 @@ function fightDuration(json){
  */
 function endPhase(json){
   var phases = json.phases;
-  var phase = phases[phases.length - 1].name;
   return getLatestValidPhase(phases)
 }
 
