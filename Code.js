@@ -54,7 +54,7 @@ function writeDataIntoSpreadsheet(row=2){
   var cellsWithSameDate = 0;
 
   for(var i = 0; i < logs.length; i++){
-    var valuesRange = sheet.getRange(i+startRow,1,1,18);
+    var valuesRange = sheet.getRange(i+startRow,1,1,23);
     var values = valuesRange.getValues();
 
     try{
@@ -101,6 +101,16 @@ function writeDataIntoSpreadsheet(row=2){
         column++;
       }
       values[0][column] = failedOnGreen(json);
+      column++;
+      values[0][column] = receivedVoidDebuff(json, "Void.D");
+      column++;
+      values[0][column] = receivedVoidDebuff(json, "J.Breath.H");
+      column++;
+      values[0][column] = receivedVoidDebuff(json, "Slam.H");
+      column++;
+      values[0][column] = receivedVoidDebuff(json, "Barrage.H");
+      column++;
+      values[0][column] = receivedVoidDebuff(json, "ShckWv.H");
     }
     catch(e){
       console.error('apiFetch yielded error: ' + e);
@@ -323,6 +333,46 @@ function failedOnGreen(json){
     }
   
     return amountOverNine;
+  }
+  catch{ 
+    return false;
+  }
+}
+
+/**
+ * Get info that players failed a given mechanic
+ *
+ * @param {String} json - fightData as json of the Encounter
+ * @param {String} mechanic - the name of the mechanic
+ * @return {String} - returns a string with all players in a row who failed the given mechanic
+ */
+function receivedVoidDebuff(json, mechanic){
+  var mechanics = json.mechanics;
+  var players = json.players;
+  var voidDebuff;
+  try{
+    for(var i = 0; i < mechanics.length; i++){
+      if(mechanics[i].name == mechanic){
+        voidDebuff = mechanics[i];
+        break;
+      }
+    }
+
+    var accountnames = "";
+    for(var t = 0; t < voidDebuff.mechanicsData.length; t++){
+      if(t != 0){
+        accountnames = accountnames + ", ";
+      }
+      var playername =  voidDebuff.mechanicsData[t].actor;
+      for(var p = 0; p < players.length; p++){
+        if(playername == players[p].name){
+          accountnames = accountnames + players[p].account;
+          break;
+        }
+      }
+    }
+  
+    return accountnames;
   }
   catch{ 
     return false;
