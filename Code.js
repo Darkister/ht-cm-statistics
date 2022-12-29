@@ -102,15 +102,15 @@ function writeDataIntoSpreadsheet(row=2){
       }
       values[0][column] = failedOnGreen(json);
       column++;
-      values[0][column] = receivedVoidDebuff(json, "Void.D");
+      values[0][column] = failedMechanic(json, "Void.D");
       column++;
-      values[0][column] = receivedVoidDebuff(json, "J.Breath.H");
+      values[0][column] = failedMechanic(json, "J.Breath.H");
       column++;
-      values[0][column] = receivedVoidDebuff(json, "Slam.H");
+      values[0][column] = failedMechanic(json, "Slam.H");
       column++;
-      values[0][column] = receivedVoidDebuff(json, "Barrage.H");
+      values[0][column] = failedMechanic(json, "Barrage.H");
       column++;
-      values[0][column] = receivedVoidDebuff(json, "ShckWv.H");
+      values[0][column] = failedMechanic(json, "ShckWv.H");
     }
     catch(e){
       console.error('apiFetch yielded error: ' + e);
@@ -346,7 +346,7 @@ function failedOnGreen(json){
  * @param {String} mechanic - the name of the mechanic
  * @return {String} - returns a string with all players in a row who failed the given mechanic
  */
-function receivedVoidDebuff(json, mechanic){
+function failedMechanic(json, mechanic){
   var mechanics = json.mechanics;
   var players = json.players;
   var voidDebuff;
@@ -361,13 +361,22 @@ function receivedVoidDebuff(json, mechanic){
     var accountnames = "";
     for(var t = 0; t < voidDebuff.mechanicsData.length; t++){
       if(t != 0){
-        accountnames = accountnames + ", ";
+        accountnames = accountnames + " ";
       }
-      var playername =  voidDebuff.mechanicsData[t].actor;
+      var playername = voidDebuff.mechanicsData[t].actor;
       for(var p = 0; p < players.length; p++){
         if(playername == players[p].name){
-          accountnames = accountnames + players[p].account;
-          break;
+          if(mechanic == "ShckWv.H"){
+            if(!accountnames.includes(players[p].account)){
+              accountnames = accountnames + players[p].account;
+              break;
+            }
+            else{break;}
+          }
+          else{
+            accountnames = accountnames + players[p].account;
+            break;
+          }
         }
       }
     }
