@@ -1,93 +1,38 @@
-var validPhases = ["Purification 1","Jormag","Primordus","Kralkatorrik","Zeitzauberer der Leere","Purification 2","Mordremoth","Zhaitan","Void Saltspray Dragon","Purification 3","Soo-Won 1","Purification 4","Soo-Won 2"];
+var validPhases = ["Purification 1","Jormag","Primordus","Kralkatorrik","Zeitzauberer der Leere","Purification 2","Mordremoth","Zhaitan","Void Saltspray Dragon","Purification 3","Soo-Won 1","Purification 4","Soo-Won 2"],
+    ss = SpreadsheetApp.getActiveSpreadsheet(),
+    logSheet = ss.getSheetByName('Logs');
 
-/**
- * Calculate amount of failes with the given conditions
- *
- * @param {String} date
- * @param {String} phase
- * @return {Integer} - returns a number
+/** Calculate amount of failes with the given conditions
+ * @param {String} date  the date which should be calculated
+ * @param {String} phase the phase which should be calculated
+ * @return {Integer}     returns a number
  * @customfunction
  */
 function getAmountOfFailes(date,phase){
   Logger.log("Start calculating with: " + date + " " + phase)
-  var ss = SpreadsheetApp.getActiveSpreadsheet(),
-      sheet = ss.getSheetByName('Logs'),
-      phaseValues = sheet.getRange(2,4,sheet.getLastRow(),1).getValues(),
-      dateValues = sheet.getRange(2,1,sheet.getLastRow(),1).getValues(),
+  var phaseValues = logSheet.getRange(2,4,logSheet.getLastRow(),1).getValues(),
+      dateValues = logSheet.getRange(2,1,logSheet.getLastRow(),1).getValues(),
       counter = 0,
-      lastValidDate = "";
-
-  if(phase == "Green"){ 
-    var greenValues = sheet.getRange(2,18,sheet.getLastRow(),1).getValues();
-    Logger.log("checking green fails " + greenValues);
+      lastValidDate = "",
+      columnOfPhase = [18,21,23],
+      checkPhases = ["Green","Slam","Shockwave"],
+      index = checkPhases.indexOf(phase);
+  
+  if(index > -1){
+    var mechanicValues = logSheet.getRange(2,columnOfPhase[index],logSheet.getLastRow(),1).getValues();
     if(date == "Over All"){
-      for(var a = 0; a < greenValues.length; a++){
-        Logger.log(greenValues[a][0]);
-        if(greenValues[a][0]){
+      for(var a = 0; a < mechanicValues.length; a++){
+        if(mechanicValues[a][0]){
           counter++;
         }
       }
     }
     else{
-      Logger.log("Date = " + date);
-      for(var i = 0; i < greenValues.length; i++){
+      for(var i = 0; i < mechanicValues.length; i++){
         if(dateValues[i][0] != ""){
-          Logger.log("current Date = " + dateValues[i][0]);
           lastValidDate = dateValues[i][0].valueOf();
         }
-        if(greenValues[i][0] && date.valueOf() == lastValidDate.valueOf()){
-          counter++;
-        }
-      }
-    }
-  }
-
-  else if(phase == "Slam"){ 
-    var slamValues = sheet.getRange(2,21,sheet.getLastRow(),1).getValues();
-    Logger.log("checking slam fails " + slamValues);
-    if(date == "Over All"){
-      for(var a = 0; a < slamValues.length; a++){
-        Logger.log(slamValues[a][0]);
-        if(slamValues[a][0] != false){
-          counter++;
-        }
-      }
-    }
-    else{
-      Logger.log("Date = " + date);
-      for(var i = 0; i < slamValues.length; i++){
-        if(dateValues[i][0] != ""){
-          Logger.log("current Date = " + dateValues[i][0]);
-          lastValidDate = dateValues[i][0].valueOf();
-        }
-        Logger.log(slamValues[i][0]);
-        if(slamValues[i][0] != false && date.valueOf() == lastValidDate.valueOf()){
-          counter++;
-        }
-      }
-    }
-  }
-
-  else if(phase == "Shockwave"){ 
-    var shockwaveValues = sheet.getRange(2,23,sheet.getLastRow(),1).getValues();
-    Logger.log("checking Shockwave fails " + shockwaveValues);
-    if(date == "Over All"){
-      for(var a = 0; a < shockwaveValues.length; a++){
-        Logger.log(shockwaveValues[a][0]);
-        if(shockwaveValues[a][0] != false){
-          counter++;
-        }
-      }
-    }
-    else{
-      Logger.log("Date = " + date);
-      for(var i = 0; i < shockwaveValues.length; i++){
-        if(dateValues[i][0] != ""){
-          Logger.log("current Date = " + dateValues[i][0]);
-          lastValidDate = dateValues[i][0].valueOf();
-        }
-        Logger.log(shockwaveValues[i][0]);
-        if(shockwaveValues[i][0] != false && date.valueOf() == lastValidDate.valueOf()){
+        if(mechanicValues[i][0] && date.valueOf() == lastValidDate.valueOf()){
           counter++;
         }
       }
@@ -115,23 +60,20 @@ function getAmountOfFailes(date,phase){
   return counter;
 }
 
-  /**
- * Checks given list of data for the best try
- *
- * @param {any[][]} data - List of Encounter results which contains the endBossphase + RestHP
- * @return {String} - returns the link to the best try
+/** Checks given list of data for the best try
+ * @param {any[][]} data List of Encounter results which contains the endBossphase + RestHP
+ * @return {String}      returns the link to the best try
  * @customfunction
  */
 function getBestTry(data){
-    var phaseNoCurr = 0;
-    var bestPercCurr = 0;
-    var bestTryCurr = 0;
-  
-    Logger.log('Start checking best try.');
+    var phaseNoCurr = 0,
+        bestPercCurr = 0,
+        bestTryCurr = 0;
   
     for(var i = 0; i < data.length; i++){
-      var phaseNoToCheck = 0;
-      var bestPercToCheck = data[i][1];
+      var phaseNoToCheck = 0,
+          bestPercToCheck = data[i][1];
+
       for(var p = 0; p < validPhases.length; p++){
         if(data[i][0] == validPhases[p]){
           phaseNoToCheck = p;
@@ -151,21 +93,16 @@ function getBestTry(data){
         bestTryCurr = i;
       }
     }
-    var ss = SpreadsheetApp.getActiveSpreadsheet();
-    var sheet = ss.getSheetByName('Logs');
-    var startRow = 2;
-    var logs = sheet.getRange(startRow,2,sheet.getLastRow()-1,1).getValues();
+    var logs = logSheet.getRange(2,2,logSheet.getLastRow()-1,1).getValues();
   
-    return logs[bestTryCurr][0]
+    return logs[bestTryCurr][0];
   }
 
-/**
- * Calculate amount of mechanic fails
- *
- * @param {any[][]} range - the range of data
- * @param {String} player - the player who failed the mechanic
- * @param {Integer} days -  [Optional] calculate only the last x days
- * @return {Integer} - returns a number
+/** Calculate amount of mechanic fails
+ * @param {any[][]} range  the range of data
+ * @param {String} player  the player who failed the mechanic
+ * @param {Integer} days   [Optional] calculate only the last x days
+ * @return {Integer}       returns a number
  * @customfunction
  */
 function getAmountOfMechanicFailes(range,player,days=-1){
@@ -176,10 +113,8 @@ function getAmountOfMechanicFailes(range,player,days=-1){
     }
   }
   else{
-    var ss = SpreadsheetApp.getActiveSpreadsheet();
-    var sheet = ss.getSheetByName('Logs');
-    var dates = sheet.getRange(2,1,sheet.getLastRow()-1,1).getValues();
-    var players = sheet.getRange(2,8,sheet.getLastRow()-1,10).getValues();
+    var dates = logSheet.getRange(2,1,logSheet.getLastRow()-1,1).getValues(),
+        players = logSheet.getRange(2,8,logSheet.getLastRow()-1,10).getValues();
     for(var i = dates.length - 1; i >= 0; i--){
       if(days > 0){
         if(dates[i][0] == ""){
@@ -236,14 +171,12 @@ function occurrences(string, subString, allowOverlapping) {
   return n;
 }
 
-/**
- * Calculate amount of mechanic fails
- *
- * @param {String} player - the player who failed the mechanic
- * @param {Integer} totalValue - 
- * @param {String} phase - Minimum reached phase
- * @param {Integer} days - [Optional]calculate only the last x days
- * @return {Integer} - returns a number
+/** Calculate amount of mechanic fails
+ * @param {String} player       the player who failed the mechanic
+ * @param {Integer} totalValue  the amount of fails
+ * @param {String} phase        Minimum reached phase
+ * @param {Integer} days        [Optional] calculate only the last x days (Default:-1)
+ * @return {Integer}            returns a number
  * @customfunction
  */
 function avgFailsPerTry(player,totalValue,phase,days=-1){
@@ -251,12 +184,10 @@ function avgFailsPerTry(player,totalValue,phase,days=-1){
   while(phase != allowedPhases[0]){
     allowedPhases.shift();
   }
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var sheet = ss.getSheetByName('Logs');
-  var dates = sheet.getRange(2,1,sheet.getLastRow()-1,1).getValues();
-  var phases = sheet.getRange(2,4,sheet.getLastRow()-1,1).getValues();
-  var players = sheet.getRange(2,8,sheet.getLastRow()-1,10).getValues();
-  var counter = 0;
+  var dates = logSheet.getRange(2,1,logSheet.getLastRow()-1,1).getValues(),
+      phases = logSheet.getRange(2,4,logSheet.getLastRow()-1,1).getValues(),
+      players = logSheet.getRange(2,8,logSheet.getLastRow()-1,10).getValues(),
+      counter = 0;
 
   if(days==-1){
     for(var i = 0; i < phases.length; i++){
