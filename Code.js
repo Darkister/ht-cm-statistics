@@ -131,9 +131,8 @@ function apiFetch(permalink) {
     muteHttpExceptions: true
   },
       data = UrlFetchApp.fetch('https://dps.report/getJson?permalink=' + permalink, opt);
-      
-  data = data.getContentText();
 
+  data = data.getContentText();
   return JSON.parse(data);
 }
 
