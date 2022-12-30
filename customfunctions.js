@@ -1,3 +1,5 @@
+var validPhases = ["Purification 1","Jormag","Primordus","Kralkatorrik","Zeitzauberer der Leere","Purification 2","Mordremoth","Zhaitan","Void Saltspray Dragon","Purification 3","Soo-Won 1","Purification 4","Soo-Won 2"];
+
 /**
  * Calculate amount of failes with the given conditions
  *
@@ -162,14 +164,46 @@ function getBestTry(data){
  *
  * @param {any[][]} range - the range of data
  * @param {String} player - the player who failed the mechanic
+ * @param {Integer} days -  [Optional] calculate only the last x days
  * @return {Integer} - returns a number
  * @customfunction
  */
-function getAmountOfMechanicFailes(range,player){
+function getAmountOfMechanicFailes(range,player,days=-1){
   var counter = 0;
-  for(var i = 0; i < range.length; i++){
-    counter += occurrences(range[i],player);
+  if(days==-1){
+    for(var i = 0; i < range.length; i++){
+      counter += occurrences(range[i],player);
+    }
   }
+  else{
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var sheet = ss.getSheetByName('Logs');
+    var dates = sheet.getRange(2,1,sheet.getLastRow()-1,1).getValues();
+    var players = sheet.getRange(2,8,sheet.getLastRow()-1,10).getValues();
+    for(var i = dates.length - 1; i >= 0; i--){
+      if(days > 0){
+        if(dates[i][0] == ""){
+          for(var p = 0; p < players[i].length; p++){
+            if(players[i][p] == player){
+              counter += occurrences(range[i],player);
+              break;
+            }
+          }
+        }
+        else{
+          for(var p = 0; p < players[i].length; p++){
+            if(players[i][p] == player){
+              counter += occurrences(range[i],player);
+              days--;
+              break;
+            }
+          }          
+        }
+      }
+      else break;
+    }
+  }
+
   return counter;
 }
 
@@ -200,4 +234,53 @@ function occurrences(string, subString, allowOverlapping) {
       } else break;
   }
   return n;
+}
+
+/**
+ * Calculate amount of mechanic fails
+ *
+ * @param {String} player - the player who failed the mechanic
+ * @param {Integer} totalValue - 
+ * @param {String} phase - Minimum reached phase
+ * @param {Integer} days - [Optional]calculate only the last x days
+ * @return {Integer} - returns a number
+ * @customfunction
+ */
+function avgFailsPerTry(player,totalValue,phase,days=-1){
+  var allowedPhases = validPhases;
+  while(phase != allowedPhases[0]){
+    allowedPhases.shift();
+  }
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName('Logs');
+  var dates = sheet.getRange(2,1,sheet.getLastRow()-1,1).getValues();
+  var phases = sheet.getRange(2,4,sheet.getLastRow()-1,1).getValues();
+  var players = sheet.getRange(2,8,sheet.getLastRow()-1,10).getValues();
+  var counter = 0;
+
+  if(days==-1){
+    for(var i = 0; i < phases.length; i++){
+      if(allowedPhases.includes(phases[i][0]) && players[i].includes(player)){
+        counter++;
+      }
+    }
+  }
+  else{
+    for(var i = dates.length - 1; i >= 0; i--){
+      if(days > 0){
+        if(dates[i][0] == "" && allowedPhases.includes(phases[i][0]) && players[i].includes(player)){
+          counter++;
+        }
+        else if(allowedPhases.includes(phases[i][0]) && players[i].includes(player)){
+          counter++;
+          days--;
+        }
+        else if(dates[i][0] != "" && players[i].includes(player)){
+          days--; 
+        }
+      }
+      else break;
+    }
+  }
+  return totalValue/counter;
 }
