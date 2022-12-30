@@ -30,7 +30,7 @@ function editTrigger(e) {
     }
   }
 
-  if(e && e.range && e.range.getRow() && e.range.getColumn() === targetCol && e.range.getSheet().getName() === targetSheet){
+  if(e && e.range && e.range.getRow() && e.range.getColumn() === targetCol && e.range.getSheet().getName() === "Logs"){
     if(inputIsValid){
       writeDataIntoSpreadsheet(e.range.getRow());
     }
@@ -49,14 +49,13 @@ function editTrigger(e) {
  *  @param {Integer} row  [OPTIONAL] defines where to start with the data writing
  */
 function writeDataIntoSpreadsheet(row=2){
-  var startRow = row,
-      logs = logSheet.getRange(startRow,2,logSheet.getLastRow()-startRow+1,1).getValues(),
+  var logs = logSheet.getRange(row,2,logSheet.getLastRow()-row+1,1).getValues(),
       date = "",
-      cellsWithSameDate = 0;
+      cellsWithSameDate = 0,
+      valuesRange = logSheet.getRange(row,1,logs.length,23),
+      values = valuesRange.getValues();
 
   for(var i = 0; i < logs.length; i++){
-    var valuesRange = logSheet.getRange(i+startRow,1,1,23),
-        values = valuesRange.getValues();
 
     try{
       var log = logs[i][0];
@@ -66,17 +65,17 @@ function writeDataIntoSpreadsheet(row=2){
           dateOfLog = getDayOfLog(json);
       if(date == ""){
         date = dateOfLog;
-        values[0][column] = dateOfLog;
+        values[i][column] = dateOfLog;
         cellsWithSameDate++;
       }
       else if(date != dateOfLog){
         date = dateOfLog;
-        values[0][column] = dateOfLog;
+        values[i][column] = dateOfLog;
         cellsWithSameDate = 1;
       }
       else if(date == dateOfLog){
-        if(!valuesRange.isPartOfMerge()){
-          sheet.getRange(i+startRow-cellsWithSameDate,1,cellsWithSameDate+1,1).mergeVertically();
+        if(!logSheet.getRange(i+row,1,cellsWithSameDate+1,1).isPartOfMerge()){
+          logSheet.getRange(i+row-cellsWithSameDate,1,cellsWithSameDate+1,1).mergeVertically();
           cellsWithSameDate++;
         }
         else{
@@ -85,27 +84,27 @@ function writeDataIntoSpreadsheet(row=2){
       }
       column++;
       column++;
-      values[0][column] = json.duration;
+      values[i][column] = json.duration;
       column++;
       var endphase = getLatestValidPhase(json.phases);
-      values[0][column] = endphase;
+      values[i][column] = endphase;
       column++;
-      values[0][column] = bossHPendPhase(json, endphase);
+      values[i][column] = bossHPendPhase(json, endphase);
       column++;
-      values[0][column] = json.durationMS > 60000 ? true : false;
+      values[i][column] = json.durationMS > 60000 ? true : false;
       column++;
-      values[0][column] = firstDeath(json);
+      values[i][column] = firstDeath(json);
       column++;
       var players = getPlayer(json);
       for(p = 0; p < 10; p++){
-        values[0][column] = players[p];
+        values[i][column] = players[p];
         column++;
       }
-      values[0][column] = failedOnGreen(json);
+      values[i][column] = failedOnGreen(json);
       column++;
-      var mechanicsToCheck = ["Void.D", "J.Breath.H", "Slam.H", "Barrage.H", "ShckWv.H"];
+      var mechanicsToCheck = ["Void.D","J.Breath.H","Slam.H","Barrage.H","ShckWv.H"];
       for(var m = 0; m < mechanicsToCheck.length; m++){
-        values[0][column] = failedMechanic(json, mechanicsToCheck[m]);
+        values[i][column] = failedMechanic(json, mechanicsToCheck[m]);
         column++;
       }
     }
@@ -114,13 +113,12 @@ function writeDataIntoSpreadsheet(row=2){
       Logger.log('Continue with Dummy data');
       for (var c = 0; c < values[0].length; c++) {
         if(c != 1){
-          values[0][c] = i + " / " + c;
+          values[i][c] = i + " / " + c;
         }
       }
     }
-
-    valuesRange.setValues(values);
   }
+  valuesRange.setValues(values);
 }
 
 /** Get data of a log as json
@@ -133,6 +131,7 @@ function apiFetch(permalink) {
     muteHttpExceptions: true
   },
       data = UrlFetchApp.fetch('https://dps.report/getJson?permalink=' + permalink, opt);
+      
   data = data.getContentText();
 
   return JSON.parse(data);
@@ -309,20 +308,18 @@ function failedMechanic(json, mechanic){
         break;
       }
     }
-
     var accountnames = "";
     for(var t = 0; t < mechanicData.mechanicsData.length; t++){
       var playername = mechanicData.mechanicsData[t].actor;
       for(var p = 0; p < players.length; p++){
-        var specialMechanics = ["ShckWv.H","Slam.H"];
+        var specialMechanics = ["Slam.H","ShckWv.H"];
         if(playername == players[p].name && specialMechanics.indexOf(mechanic) > -1){
           if(accountnames == ""){
-            accountnames = players[p].account;
-            break;
+            return players[p].account;
           }
           else break;
         }
-        else{
+        else if(playername == players[p].name){
           accountnames += players[p].account;
           break;
         }    
@@ -330,7 +327,7 @@ function failedMechanic(json, mechanic){
     } 
     return accountnames;
   }
-  catch{ 
+  catch{
     return false;
   }
 }
