@@ -348,38 +348,34 @@ function failedOnGreen(json){
 function failedMechanic(json, mechanic){
   var mechanics = json.mechanics;
   var players = json.players;
-  var voidDebuff;
+  var mechanicData;
   try{
     for(var i = 0; i < mechanics.length; i++){
       if(mechanics[i].name == mechanic){
-        voidDebuff = mechanics[i];
+        mechanicData = mechanics[i];
         break;
       }
     }
 
     var accountnames = "";
-    for(var t = 0; t < voidDebuff.mechanicsData.length; t++){
-      if(t != 0){
-        accountnames = accountnames + " ";
-      }
-      var playername = voidDebuff.mechanicsData[t].actor;
+    for(var t = 0; t < mechanicData.mechanicsData.length; t++){
+      var playername = mechanicData.mechanicsData[t].actor;
       for(var p = 0; p < players.length; p++){
         if(playername == players[p].name){
-          if(mechanic == "ShckWv.H"){
-            if(!accountnames.includes(players[p].account)){
-              accountnames = accountnames + players[p].account;
+          if(mechanic == "ShckWv.H" || mechanic == "Slam.H"){
+            if(accountnames == ""){
+              accountnames = players[p].account;
               break;
             }
             else{break;}
           }
           else{
-            accountnames = accountnames + players[p].account;
+            accountnames += players[p].account;
             break;
           }
         }
       }
-    }
-  
+    } 
     return accountnames;
   }
   catch{ 
