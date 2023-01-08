@@ -1,7 +1,9 @@
 var validPhases = ["Purification 1","Jormag","Primordus","Kralkatorrik","Zeitzauberer der Leere","Purification 2","Mordremoth","Zhaitan","Void Saltspray Dragon","Purification 3","Soo-Won 1","Purification 4","Soo-Won 2"],
     targetValues = ["Heart 1","The JormagVoid","The PrimordusVoid","The KralkatorrikVoid","Zeitzauberer der Leere","Heart 2","The MordremothVoid","The ZhaitanVoid","Void Saltspray Dragon","Heart 3","The SooWonVoid","Heart 4"],
     ss = SpreadsheetApp.getActiveSpreadsheet(),
-    logSheet = ss.getSheetByName('Logs');
+    logSheet = ss.getSheetByName('Logs'),
+    staticSheet = ss.getSheetByName('Setup und Co'),
+    statisticsSheet = ss.getSheetByName('Statistics');
 
 /** Trigger to check that dps.reports are entered into the correct space and to automatically run writeDataIntoSpreadsheet when the input ios valid
  *  @param {*} e 
@@ -43,6 +45,8 @@ function editTrigger(e) {
       cell.setValue("Wrong records found, check the entries or contact an admin");
     }
   }
+
+  fillAllPlayersAccName();
 }
 
 /** Write Data of the Log into the Spreadsheet
@@ -329,4 +333,30 @@ function failedMechanic(json, mechanic){
   catch{
     return false;
   }
+}
+
+/** Get the Accountnames of all Players and fill it into the Statisticssheet
+ */
+function fillAllPlayersAccName(){
+  var players = logSheet.getRange(2,8,logSheet.getLastRow()-1,10).getValues(),
+      static = staticSheet.getRange(2,2,10,1).getValues(),
+      allPlayers = new Array();
+
+  for(var i = 0; i < 10; i++){
+    if(static[i][0] != "" && !allPlayers.includes(static[i][0])) allPlayers.push(static[i][0]);
+  }
+
+  for(var r = 0; r < players.length; r++){
+    for(var c = 0; c < 10; c++){
+      if(players[r][c] != "" && !allPlayers.includes(players[r][c])) allPlayers.push(players[r][c]);
+    }
+  }
+
+  var fillPlayers = statisticsSheet.getRange(9,1,allPlayers.length,1),
+      playerValues = fillPlayers.getValues();
+  for(var a = 0; a < allPlayers.length; a++){
+    playerValues[a][0] = allPlayers[a];
+  }
+  Logger.log(playerValues);
+  fillPlayers.setValues(playerValues);
 }
