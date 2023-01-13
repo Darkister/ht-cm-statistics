@@ -1,5 +1,6 @@
 var validPhases = ["Purification 1","Jormag","Primordus","Kralkatorrik","Zeitzauberer der Leere","Purification 2","Mordremoth","Zhaitan","Void Saltspray Dragon","Purification 3","Soo-Won 1","Purification 4","Soo-Won 2"],
     targetValues = ["Heart 1","The JormagVoid","The PrimordusVoid","The KralkatorrikVoid","Zeitzauberer der Leere","Heart 2","The MordremothVoid","The ZhaitanVoid","Void Saltspray Dragon","Heart 3","The SooWonVoid","Heart 4"],
+    mechanicsToCheck = ["Void.D","J.Breath.H","Slam.H","Barrage.H","ShckWv.H"],
     ss = SpreadsheetApp.getActiveSpreadsheet(),
     logSheet = ss.getSheetByName('Logs'),
     staticSheet = ss.getSheetByName('Setup und Co'),
@@ -47,6 +48,7 @@ function editTrigger(e) {
   }
 
   fillAllPlayersAccName();
+  fillFailedPhases();
 }
 
 /** Write Data of the Log into the Spreadsheet
@@ -106,7 +108,7 @@ function writeDataIntoSpreadsheet(row=2){
       }
       values[i][column] = failedOnGreen(json);
       column++;
-      var mechanicsToCheck = ["Void.D","J.Breath.H","Slam.H","Barrage.H","ShckWv.H"];
+
       for(var m = 0; m < mechanicsToCheck.length; m++){
         values[i][column] = failedMechanic(json, mechanicsToCheck[m]);
         column++;
@@ -359,4 +361,138 @@ function fillAllPlayersAccName(){
   }
   Logger.log(playerValues);
   fillPlayers.setValues(playerValues);
+}
+
+/** Get the failed Phases and fill it into the Statisticsheet
+ */
+function fillFailedPhases(){
+  var logValues = logSheet.getRange(1,1,logSheet.getLastRow(),logSheet.getLastColumn()).getValues(),
+      statisticsRange = statisticsSheet.getRange(9,7,50,statisticsSheet.getLastColumn()),
+      statisticsvalues = statisticsRange.getValues(),
+      currentRow = 0,
+      jorFailes = 0,
+      priFailes = 0,
+      kraFailes = 0,
+      pu2Failes = 0,
+      morFailes = 0,
+      zhaFailes = 0,
+      pu3Failes = 0,
+      sw1Failes = 0,
+      pu4Failes = 0,
+      sw2Failes = 0,
+      greenFailes = 0,
+      slamFailes = 0,
+      shwaveFailes = 0;
+
+  statisticsvalues[currentRow][0] = "Over All";
+  statisticsvalues[currentRow][1] = "=SUM(H10:H)";
+  statisticsvalues[currentRow][2] = "=SUM(I10:I)";
+  statisticsvalues[currentRow][3] = "=SUM(J10:J)";
+  statisticsvalues[currentRow][4] = "=SUM(K10:K)";
+  statisticsvalues[currentRow][5] = "=SUM(L10:L)";
+  statisticsvalues[currentRow][6] = "=SUM(M10:M)";
+  statisticsvalues[currentRow][7] = "=SUM(N10:N)";
+  statisticsvalues[currentRow][8] = "=SUM(O10:O)";
+  statisticsvalues[currentRow][9] = "=SUM(P10:P)";
+  statisticsvalues[currentRow][10] = "=SUM(Q10:Q)";
+  statisticsvalues[currentRow][11] = "=SUM(R10:R)";
+  statisticsvalues[currentRow][12] = "=SUM(S10:S)";
+  statisticsvalues[currentRow][13] = "=SUM(T10:T)";
+  statisticsvalues[currentRow][14] = "=SUM(U10:U)";
+
+  for(var i = 1; i < logValues.length; i++){
+    if(logValues[i][0] != ""){
+      currentRow++;
+      statisticsvalues[currentRow][0] = logValues[i][0];
+    }
+    if(logValues[i][3] == "Jormag"){
+      jorFailes++;
+    }
+    else if(logValues[i][3] == "Primordus"){
+      priFailes++;
+    }
+    else if(logValues[i][3] == "Kralkatorrik"){
+      kraFailes++;
+    }
+    else if(logValues[i][3] == "Purification 2"){
+      pu2Failes++;
+    }
+    else if(logValues[i][3] == "Mordremoth"){
+      morFailes++;
+    }
+    else if(logValues[i][3] == "Zhaitan"){
+      zhaFailes++;
+    }
+    else if(logValues[i][3] == "Purification 3"){
+      pu3Failes++;
+    }
+    else if(logValues[i][3] == "Soo-Won 1"){
+      sw1Failes++;
+    }
+    else if(logValues[i][3] == "Purification 4"){
+      pu4Failes++;
+    }
+    else if(logValues[i][3] == "Soo-Won 2"){
+      sw2Failes++;
+    }
+
+    if(logValues[i][17]){
+      greenFailes++;
+    }
+    else if(logValues[i][20] != false){
+      slamFailes++;
+    }
+    else if(logValues[i][22] != false){
+      shwaveFailes++;
+    }
+
+    try{
+      if(logValues[i+1][0] != ""){
+        statisticsvalues[currentRow][1] = jorFailes;
+        statisticsvalues[currentRow][2] = priFailes;
+        statisticsvalues[currentRow][3] = kraFailes;
+        statisticsvalues[currentRow][4] = pu2Failes;
+        statisticsvalues[currentRow][5] = morFailes;
+        statisticsvalues[currentRow][6] = zhaFailes;
+        statisticsvalues[currentRow][7] = pu3Failes;
+        statisticsvalues[currentRow][8] = sw1Failes;
+        statisticsvalues[currentRow][9] = pu4Failes;
+        statisticsvalues[currentRow][10] = sw2Failes;
+        statisticsvalues[currentRow][11] = "=SUM(H"+ String(currentRow+9) + ":Q" + String(currentRow+9) + ")";
+        statisticsvalues[currentRow][12] = greenFailes;
+        statisticsvalues[currentRow][13] = slamFailes;
+        statisticsvalues[currentRow][14] = shwaveFailes;
+        jorFailes = 0;
+        priFailes = 0;
+        kraFailes = 0;
+        pu2Failes = 0;
+        morFailes = 0;
+        zhaFailes = 0;
+        pu3Failes = 0;
+        sw1Failes = 0;
+        pu4Failes = 0;
+        sw2Failes = 0;
+        greenFailes = 0;
+        slamFailes = 0;
+        shwaveFailes = 0;
+      }
+    }
+    catch{
+      statisticsvalues[currentRow][1] = jorFailes;
+      statisticsvalues[currentRow][2] = priFailes;
+      statisticsvalues[currentRow][3] = kraFailes;
+      statisticsvalues[currentRow][4] = pu2Failes;
+      statisticsvalues[currentRow][5] = morFailes;
+      statisticsvalues[currentRow][6] = zhaFailes;
+      statisticsvalues[currentRow][7] = pu3Failes;
+      statisticsvalues[currentRow][8] = sw1Failes;
+      statisticsvalues[currentRow][9] = pu4Failes;
+      statisticsvalues[currentRow][10] = sw2Failes;
+      statisticsvalues[currentRow][11] = "=SUM(H"+ String(currentRow+9) + ":Q" + String(currentRow+9) + ")";
+      statisticsvalues[currentRow][12] = greenFailes;
+      statisticsvalues[currentRow][13] = slamFailes;
+      statisticsvalues[currentRow][14] = shwaveFailes;
+      statisticsRange.setValues(statisticsvalues);
+    }
+  }                         
 }

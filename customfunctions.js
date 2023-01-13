@@ -2,64 +2,6 @@ var validPhases = ["Purification 1","Jormag","Primordus","Kralkatorrik","Zeitzau
     ss = SpreadsheetApp.getActiveSpreadsheet(),
     logSheet = ss.getSheetByName('Logs');
 
-/** Calculate amount of failes with the given conditions
- * @param {String} date  the date which should be calculated
- * @param {String} phase the phase which should be calculated
- * @return {Integer}     returns a number
- * @customfunction
- */
-function getAmountOfFailes(date,phase){
-  Logger.log("Start calculating with: " + date + " " + phase)
-  var phaseValues = logSheet.getRange(2,4,logSheet.getLastRow(),1).getValues(),
-      dateValues = logSheet.getRange(2,1,logSheet.getLastRow(),1).getValues(),
-      counter = 0,
-      lastValidDate = "",
-      columnOfPhase = [18,21,23],
-      checkPhases = ["Green","Slam","Shockwave"],
-      index = checkPhases.indexOf(phase);
-  
-  if(index > -1){
-    var mechanicValues = logSheet.getRange(2,columnOfPhase[index],logSheet.getLastRow(),1).getValues();
-    if(date == "Over All"){
-      for(var a = 0; a < mechanicValues.length; a++){
-        if(mechanicValues[a][0]){
-          counter++;
-        }
-      }
-    }
-    else{
-      for(var i = 0; i < mechanicValues.length; i++){
-        if(dateValues[i][0] != ""){
-          lastValidDate = dateValues[i][0].valueOf();
-        }
-        if(mechanicValues[i][0] && date.valueOf() == lastValidDate.valueOf()){
-          counter++;
-        }
-      }
-    }
-  }
-
-  else if(date == "Over All"){
-    for(var a = 0; a < phaseValues.length; a++){
-      if(phaseValues[a][0] == phase){
-        counter++;
-      }
-    }
-  }
-
-  else{
-    for(var i = 0; i < phaseValues.length; i++){
-      if(dateValues[i][0] != ""){
-        lastValidDate = dateValues[i][0].valueOf();
-      }
-      if(phaseValues[i][0] == phase && date.valueOf() == lastValidDate.valueOf()){
-        counter++;
-      }
-    }
-  }
-  return counter;
-}
-
 /** Checks given list of data for the best try
  * @param {any[][]} data List of Encounter results which contains the endBossphase + RestHP
  * @return {String}      returns the link to the best try
