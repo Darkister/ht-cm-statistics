@@ -369,20 +369,7 @@ function fillFailedPhases(){
   var logValues = logSheet.getRange(1,1,logSheet.getLastRow(),logSheet.getLastColumn()).getValues(),
       statisticsRange = statisticsSheet.getRange(9,7,50,statisticsSheet.getLastColumn()),
       statisticsvalues = statisticsRange.getValues(),
-      currentRow = 0,
-      jorFailes = 0,
-      priFailes = 0,
-      kraFailes = 0,
-      pu2Failes = 0,
-      morFailes = 0,
-      zhaFailes = 0,
-      pu3Failes = 0,
-      sw1Failes = 0,
-      pu4Failes = 0,
-      sw2Failes = 0,
-      greenFailes = 0,
-      slamFailes = 0,
-      shwaveFailes = 0;
+      currentRow = jorFailes = priFailes = kraFailes = pu2Failes = morFailes = zhaFailes = pu3Failes = sw1Failes = pu4Failes = sw2Failes = greenFailes = slamFailes = shwaveFailes = 0;
 
   statisticsvalues[currentRow][0] = "Over All";
   statisticsvalues[currentRow][1] = "=SUM(H10:H)";
@@ -462,19 +449,7 @@ function fillFailedPhases(){
         statisticsvalues[currentRow][12] = greenFailes;
         statisticsvalues[currentRow][13] = slamFailes;
         statisticsvalues[currentRow][14] = shwaveFailes;
-        jorFailes = 0;
-        priFailes = 0;
-        kraFailes = 0;
-        pu2Failes = 0;
-        morFailes = 0;
-        zhaFailes = 0;
-        pu3Failes = 0;
-        sw1Failes = 0;
-        pu4Failes = 0;
-        sw2Failes = 0;
-        greenFailes = 0;
-        slamFailes = 0;
-        shwaveFailes = 0;
+        jorFailes = priFailes = kraFailes = pu2Failes = morFailes = zhaFailes = pu3Failes = sw1Failes = pu4Failes = sw2Failes = greenFailes = slamFailes = shwaveFailes = 0;
       }
     }
     catch{
