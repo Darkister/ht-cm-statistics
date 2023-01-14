@@ -259,12 +259,11 @@ function getDayOfLog(json){
 /** Get info that try failed on green mechanic
  *  This function is experimental and based on a custom logic
  *  @param {String} json  fightData as json of the Encounter
- *  @return {Boolean}     returns a date
+ *  @return {Boolean}     returns a boolean
  */
 function failedOnGreen(json){
   var mechanics = json.mechanics,
-      downs,
-      amountOverNine;
+      downs;
 
   try{
     for(var i = 0; i < mechanics.length; i++){
@@ -286,10 +285,8 @@ function failedOnGreen(json){
         timesAmount++;
       }
     }
-
-    timesAmount > 8 ? amountOverNine = true : amountOverNine = false;
   
-    return amountOverNine;
+    return timesAmount > 8;
   }
   catch{ 
     return false;
@@ -342,23 +339,25 @@ function failedMechanic(json, mechanic){
 function fillAllPlayersAccName(){
   var players = logSheet.getRange(2,8,logSheet.getLastRow()-1,10).getValues(),
       static = staticSheet.getRange(2,2,10,1).getValues(),
-      allPlayers = new Array();
+      allPlayers = new Set();
 
   for(var i = 0; i < 10; i++){
-    if(static[i][0] != "" && !allPlayers.includes(static[i][0])) allPlayers.push(static[i][0]);
+    allPlayers.add(static[i][0]);
   }
 
   for(var r = 0; r < players.length; r++){
     for(var c = 0; c < 10; c++){
-      if(players[r][c] != "" && !allPlayers.includes(players[r][c])) allPlayers.push(players[r][c]);
+      allPlayers.add(players[r][c]);
     }
   }
 
-  var fillPlayers = statisticsSheet.getRange(9,1,allPlayers.length,1),
+  var fillPlayers = statisticsSheet.getRange(9,1,allPlayers.size,1),
+      arr = Array.from(allPlayers),
       playerValues = fillPlayers.getValues();
-  for(var a = 0; a < allPlayers.length; a++){
-    playerValues[a][0] = allPlayers[a];
+  for(var a = 0; a < arr.length; a++){
+    playerValues[a][0] = arr[a];
   }
+
   Logger.log(playerValues);
   fillPlayers.setValues(playerValues);
 }
