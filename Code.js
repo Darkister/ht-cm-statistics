@@ -59,59 +59,47 @@ function writeDataIntoSpreadsheet(row=2){
       date = "",
       cellsWithSameDate = 0,
       valuesRange = logSheet.getRange(row,1,logs.length,23),
-      values = valuesRange.getValues();
+      values = new Array();
 
   for(var i = 0; i < logs.length; i++){
-
+    if(!(i in values)){
+      values[i].push([]);
+    }
     try{
       var log = logs[i][0];
       Logger.log("Next Log to calculate: " + log);
       var json = apiFetch(log),
-          column = 0,
           dateOfLog = getDayOfLog(json);
       if(date == ""){
         date = dateOfLog;
-        values[i][column] = dateOfLog;
         cellsWithSameDate++;
       }
       else if(date != dateOfLog){
         date = dateOfLog;
-        values[i][column] = dateOfLog;
         cellsWithSameDate = 1;
       }
       else if(date == dateOfLog){
         if(!logSheet.getRange(i+row,1,cellsWithSameDate+1,1).isPartOfMerge()){
-          logSheet.getRange(i+row-cellsWithSameDate,1,cellsWithSameDate+1,1).mergeVertically();
-          cellsWithSameDate++;
+          logSheet.getRange(i+row-cellsWithSameDate,1,cellsWithSameDate+1,1).mergeVertically();       
         }
-        else{
-          cellsWithSameDate++;
-        }
+        cellsWithSameDate++;
       }
-      column++;
-      column++;
-      values[i][column] = json.duration;
-      column++;
+      values[i].push(dateOfLog);
+      values[i].push(logs[i][0]);
+      values[i].push(json.duration);
       var endphase = getLatestValidPhase(json.phases);
-      values[i][column] = endphase;
-      column++;
-      values[i][column] = bossHPendPhase(json, endphase);
-      column++;
-      values[i][column] = json.durationMS > 60000 ? true : false;
-      column++;
-      values[i][column] = firstDeath(json);
-      column++;
+      values[i].push(endphase);
+      values[i].push(bossHPendPhase(json, endphase));
+      values[i].push(json.durationMS > 60000);
+      values[i].push(firstDeath(json));
       var players = getPlayer(json);
       for(p = 0; p < 10; p++){
-        values[i][column] = players[p];
-        column++;
+        values[i].push(players[p]);
       }
-      values[i][column] = failedOnGreen(json);
-      column++;
+      values[i].push(failedOnGreen(json));
 
       for(var m = 0; m < mechanicsToCheck.length; m++){
-        values[i][column] = failedMechanic(json, mechanicsToCheck[m]);
-        column++;
+        values[i].push(failedMechanic(json, mechanicsToCheck[m]));
       }
     }
     catch(e){
@@ -124,6 +112,7 @@ function writeDataIntoSpreadsheet(row=2){
       }
     }
   }
+  Logger.log(values);
   valuesRange.setValues(values);
 }
 
@@ -351,11 +340,18 @@ function fillAllPlayersAccName(){
     }
   }
 
-  var fillPlayers = statisticsSheet.getRange(9,1,allPlayers.size,1),
+  var fillPlayers = statisticsSheet.getRange(9,1,allPlayers.size,5),
       arr = Array.from(allPlayers),
-      playerValues = fillPlayers.getValues();
+      playerValues = new Array();
   for(var a = 0; a < arr.length; a++){
-    playerValues[a][0] = arr[a];
+    if(!(a in playerValues)){
+      playerValues.push([]);
+    }
+    playerValues[a].push(arr[a]);
+    playerValues[a].push("=COUNTIF(Logs!H2:Q;A" + (a+9) + ")");
+    playerValues[a].push("=B" + (a+9) + "/A8");
+    playerValues[a].push("=COUNTIFS(Logs!G2:G;A" + (a+9) + ";Logs!R2:R;FALSE)");
+    playerValues[a].push("=D" + (a+9) + "/B" + (a+9));
   }
 
   Logger.log(playerValues);
