@@ -354,8 +354,32 @@ function fillAllPlayersAccName(){
     playerValues[a].push("=D" + (a+9) + "/B" + (a+9));
   }
 
-  Logger.log(playerValues);
-  fillPlayers.setValues(playerValues);
+  fillPlayers.setValues(playerValues)
+    .setHorizontalAlignment("center")
+    .setFontSize(11)
+    .setFontFamily("Arial")
+    .setBorder(true,true,true,true,null,null,"black",SpreadsheetApp.BorderStyle.SOLID_THICK);
+  statisticsSheet.getRange(9,1,10,5).setBorder(null,null,true,null,null,null,"black",SpreadsheetApp.BorderStyle.SOLID_THICK);  
+  statisticsSheet.getRange(9,1,allPlayers.size,1).setBorder(null,null,null,true,null,null,"black",SpreadsheetApp.BorderStyle.SOLID_THICK);
+  statisticsSheet.getRange(9,3,allPlayers.size,1).setNumberFormat("#0.00%");
+  statisticsSheet.getRange(9,5,allPlayers.size,1).setNumberFormat("#0.00%");
+
+  var ruleParticipation = SpreadsheetApp.newConditionalFormatRule()
+    .setGradientMaxpoint("#008B00")
+    .setGradientMidpointWithValue("#FFFF00", SpreadsheetApp.InterpolationType.PERCENTILE, "50")
+    .setGradientMinpoint("#FF0000")
+    .setRanges([statisticsSheet.getRange(9,3,allPlayers.size,1)])
+    .build();
+  var ruleFirstDeath = SpreadsheetApp.newConditionalFormatRule()
+    .setGradientMaxpoint("#FF0000")
+    .setGradientMidpointWithValue("#FFFF00", SpreadsheetApp.InterpolationType.PERCENTILE, "50")
+    .setGradientMinpoint("#008B00")
+    .setRanges([statisticsSheet.getRange(9,5,allPlayers.size,1)])
+    .build();
+  var rules = new Array();
+  rules.push(ruleParticipation);
+  rules.push(ruleFirstDeath);
+  statisticsSheet.setConditionalFormatRules(rules);
 }
 
 /** Get the failed Phases and fill it into the Statisticsheet
@@ -365,7 +389,7 @@ function fillFailedPhases(){
       statisticsRange = statisticsSheet.getRange(9,7,50,statisticsSheet.getLastColumn()),
       statisticsvalues = statisticsRange.getValues(),
       currentRow = jorFailes = priFailes = kraFailes = pu2Failes = morFailes = zhaFailes = pu3Failes = sw1Failes = pu4Failes = sw2Failes = greenFailes = slamFailes = shwaveFailes = 0;
-
+  
   statisticsvalues[currentRow][0] = "Over All";
   statisticsvalues[currentRow][1] = "=SUM(H10:H)";
   statisticsvalues[currentRow][2] = "=SUM(I10:I)";
