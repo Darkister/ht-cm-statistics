@@ -47,8 +47,9 @@ function editTrigger(e) {
     }
   }
 
-  fillAllPlayersAccName();
-  fillFailedPhases();
+  var amountOfPlayers = fillAllPlayersAccName(),
+      amountOfDays = fillFailedPhases();
+  updateStatisticsLayout(amountOfPlayers,amountOfDays);
 }
 
 /** Write Data of the Log into the Spreadsheet
@@ -347,11 +348,7 @@ function fillAllPlayersAccName(){
     if(!(a in playerValues)){
       playerValues.push([]);
     }
-    playerValues[a].push(arr[a]);
-    playerValues[a].push("=COUNTIF(Logs!H2:Q;A" + (a+9) + ")");
-    playerValues[a].push("=B" + (a+9) + "/A8");
-    playerValues[a].push("=COUNTIFS(Logs!G2:G;A" + (a+9) + ";Logs!R2:R;FALSE)");
-    playerValues[a].push("=D" + (a+9) + "/B" + (a+9));
+    playerValues[a].push(arr[a],"=COUNTIF(Logs!H2:Q;A" + (a+9) + ")","=B" + (a+9) + "/A8","=COUNTIFS(Logs!G2:G;A" + (a+9) + ";Logs!R2:R;FALSE)","=D" + (a+9) + "/B" + (a+9));
   }
 
   fillPlayers.setValues(playerValues)
@@ -359,57 +356,30 @@ function fillAllPlayersAccName(){
     .setFontSize(11)
     .setFontFamily("Arial")
     .setBorder(true,true,true,true,null,null,"black",SpreadsheetApp.BorderStyle.SOLID_THICK);
-  statisticsSheet.getRange(9,1,10,5).setBorder(null,null,true,null,null,null,"black",SpreadsheetApp.BorderStyle.SOLID_THICK);  
-  statisticsSheet.getRange(9,1,allPlayers.size,1).setBorder(null,null,null,true,null,null,"black",SpreadsheetApp.BorderStyle.SOLID_THICK);
-  statisticsSheet.getRange(9,3,allPlayers.size,1).setNumberFormat("#0.00%");
-  statisticsSheet.getRange(9,5,allPlayers.size,1).setNumberFormat("#0.00%");
-
-  var ruleParticipation = SpreadsheetApp.newConditionalFormatRule()
-    .setGradientMaxpoint("#008B00")
-    .setGradientMidpointWithValue("#FFFF00", SpreadsheetApp.InterpolationType.PERCENTILE, "50")
-    .setGradientMinpoint("#FF0000")
-    .setRanges([statisticsSheet.getRange(9,3,allPlayers.size,1)])
-    .build();
-  var ruleFirstDeath = SpreadsheetApp.newConditionalFormatRule()
-    .setGradientMaxpoint("#FF0000")
-    .setGradientMidpointWithValue("#FFFF00", SpreadsheetApp.InterpolationType.PERCENTILE, "50")
-    .setGradientMinpoint("#008B00")
-    .setRanges([statisticsSheet.getRange(9,5,allPlayers.size,1)])
-    .build();
-  var rules = new Array();
-  rules.push(ruleParticipation);
-  rules.push(ruleFirstDeath);
-  statisticsSheet.setConditionalFormatRules(rules);
+  statisticsSheet.getRange(9,1,10,5).setBorder(null,null,true,null,null,null,"black",SpreadsheetApp.BorderStyle.SOLID_THICK); 
+  return allPlayers.size; 
 }
 
 /** Get the failed Phases and fill it into the Statisticsheet
  */
 function fillFailedPhases(){
   var logValues = logSheet.getRange(1,1,logSheet.getLastRow(),logSheet.getLastColumn()).getValues(),
-      statisticsRange = statisticsSheet.getRange(9,7,50,statisticsSheet.getLastColumn()),
-      statisticsvalues = statisticsRange.getValues(),
+      statisticsValues = new Array(),
       currentRow = jorFailes = priFailes = kraFailes = pu2Failes = morFailes = zhaFailes = pu3Failes = sw1Failes = pu4Failes = sw2Failes = greenFailes = slamFailes = shwaveFailes = 0;
   
-  statisticsvalues[currentRow][0] = "Over All";
-  statisticsvalues[currentRow][1] = "=SUM(H10:H)";
-  statisticsvalues[currentRow][2] = "=SUM(I10:I)";
-  statisticsvalues[currentRow][3] = "=SUM(J10:J)";
-  statisticsvalues[currentRow][4] = "=SUM(K10:K)";
-  statisticsvalues[currentRow][5] = "=SUM(L10:L)";
-  statisticsvalues[currentRow][6] = "=SUM(M10:M)";
-  statisticsvalues[currentRow][7] = "=SUM(N10:N)";
-  statisticsvalues[currentRow][8] = "=SUM(O10:O)";
-  statisticsvalues[currentRow][9] = "=SUM(P10:P)";
-  statisticsvalues[currentRow][10] = "=SUM(Q10:Q)";
-  statisticsvalues[currentRow][11] = "=SUM(R10:R)";
-  statisticsvalues[currentRow][12] = "=SUM(S10:S)";
-  statisticsvalues[currentRow][13] = "=SUM(T10:T)";
-  statisticsvalues[currentRow][14] = "=SUM(U10:U)";
+  if(!(0 in statisticsValues)){
+    statisticsValues.push([]);
+  }
+  statisticsValues[0].push("Over All","=SUM(H10:H)","=SUM(I10:I)","=SUM(J10:J)","=SUM(K10:K)","=SUM(L10:L)","=SUM(M10:M)","=SUM(N10:N)","=SUM(O10:O)","=SUM(P10:P)","=SUM(Q10:Q)","=SUM(R10:R)","=SUM(S10:S)","=SUM(T10:T)","=SUM(U10:U)");
 
   for(var i = 1; i < logValues.length; i++){
+    
     if(logValues[i][0] != ""){
+      if(!(currentRow+1 in statisticsValues)){
+        statisticsValues.push([]);
+      }
       currentRow++;
-      statisticsvalues[currentRow][0] = logValues[i][0];
+      statisticsValues[currentRow].push(logValues[i][0]);
     }
     if(logValues[i][3] == "Jormag"){
       jorFailes++;
@@ -451,42 +421,77 @@ function fillFailedPhases(){
     else if(logValues[i][22] != false){
       shwaveFailes++;
     }
-
+    
     try{
       if(logValues[i+1][0] != ""){
-        statisticsvalues[currentRow][1] = jorFailes;
-        statisticsvalues[currentRow][2] = priFailes;
-        statisticsvalues[currentRow][3] = kraFailes;
-        statisticsvalues[currentRow][4] = pu2Failes;
-        statisticsvalues[currentRow][5] = morFailes;
-        statisticsvalues[currentRow][6] = zhaFailes;
-        statisticsvalues[currentRow][7] = pu3Failes;
-        statisticsvalues[currentRow][8] = sw1Failes;
-        statisticsvalues[currentRow][9] = pu4Failes;
-        statisticsvalues[currentRow][10] = sw2Failes;
-        statisticsvalues[currentRow][11] = "=SUM(H"+ String(currentRow+9) + ":Q" + String(currentRow+9) + ")";
-        statisticsvalues[currentRow][12] = greenFailes;
-        statisticsvalues[currentRow][13] = slamFailes;
-        statisticsvalues[currentRow][14] = shwaveFailes;
+        statisticsValues[currentRow].push(jorFailes,priFailes,kraFailes,pu2Failes,morFailes,zhaFailes,pu3Failes,sw1Failes,pu4Failes,sw2Failes,"=SUM(H"+ String(currentRow+9) + ":Q" + String(currentRow+9) + ")",greenFailes,slamFailes,shwaveFailes);
         jorFailes = priFailes = kraFailes = pu2Failes = morFailes = zhaFailes = pu3Failes = sw1Failes = pu4Failes = sw2Failes = greenFailes = slamFailes = shwaveFailes = 0;
       }
     }
     catch{
-      statisticsvalues[currentRow][1] = jorFailes;
-      statisticsvalues[currentRow][2] = priFailes;
-      statisticsvalues[currentRow][3] = kraFailes;
-      statisticsvalues[currentRow][4] = pu2Failes;
-      statisticsvalues[currentRow][5] = morFailes;
-      statisticsvalues[currentRow][6] = zhaFailes;
-      statisticsvalues[currentRow][7] = pu3Failes;
-      statisticsvalues[currentRow][8] = sw1Failes;
-      statisticsvalues[currentRow][9] = pu4Failes;
-      statisticsvalues[currentRow][10] = sw2Failes;
-      statisticsvalues[currentRow][11] = "=SUM(H"+ String(currentRow+9) + ":Q" + String(currentRow+9) + ")";
-      statisticsvalues[currentRow][12] = greenFailes;
-      statisticsvalues[currentRow][13] = slamFailes;
-      statisticsvalues[currentRow][14] = shwaveFailes;
-      statisticsRange.setValues(statisticsvalues);
+      var statisticsRange = statisticsSheet.getRange(9,7,statisticsValues.length,statisticsSheet.getLastColumn()-6);
+      statisticsValues[currentRow].push(jorFailes,priFailes,kraFailes,pu2Failes,morFailes,zhaFailes,pu3Failes,sw1Failes,pu4Failes,sw2Failes,"=SUM(H"+ String(currentRow+9) + ":Q" + String(currentRow+9) + ")",greenFailes,slamFailes,shwaveFailes);
+      Logger.log(statisticsValues);
+      statisticsRange.setValues(statisticsValues)
+        .setHorizontalAlignment("center")
+        .setFontSize(11)
+        .setFontFamily("Arial")
+        .setBorder(true,true,true,true,null,null,"black",SpreadsheetApp.BorderStyle.SOLID_THICK);
+      return statisticsValues.length;
     }
   }                         
+}
+
+/** Get the failed Phases and fill it into the Statisticsheet
+ */
+function updateStatisticsLayout(amountOfPlayers,amountOfDays){
+  var rules = new Array();
+  // Layout settings for the list of players including the Participation and first Deaths
+  statisticsSheet.getRange(9,1,amountOfPlayers,1).setBorder(null,null,null,true,null,null,"black",SpreadsheetApp.BorderStyle.SOLID_THICK);
+  statisticsSheet.getRange(9,3,amountOfPlayers,1).setBorder(null,null,null,true,null,null,"black",SpreadsheetApp.BorderStyle.SOLID_THICK);
+  statisticsSheet.getRange(9,3,amountOfPlayers,1).setNumberFormat("#0.00%");
+  statisticsSheet.getRange(9,5,amountOfPlayers,1).setNumberFormat("#0.00%");
+
+  var ruleParticipation = SpreadsheetApp.newConditionalFormatRule()
+    .setGradientMaxpoint("#008B00")
+    .setGradientMidpointWithValue("#FFFF00", SpreadsheetApp.InterpolationType.PERCENTILE, "50")
+    .setGradientMinpoint("#FF0000")
+    .setRanges([statisticsSheet.getRange(9,3,amountOfPlayers,1)])
+    .build();
+  var ruleFirstDeath = SpreadsheetApp.newConditionalFormatRule()
+    .setGradientMaxpoint("#FF0000")
+    .setGradientMidpointWithValue("#FFFF00", SpreadsheetApp.InterpolationType.PERCENTILE, "50")
+    .setGradientMinpoint("#008B00")
+    .setRanges([statisticsSheet.getRange(9,5,amountOfPlayers,1)])
+    .build();
+
+  rules.push(ruleParticipation);
+  rules.push(ruleFirstDeath);
+
+  // Layout settings for the Martix of Phases/Mechanics and Days
+  statisticsSheet.getRange(9,7,amountOfDays,1).setBorder(true,true,true,true,true,true,"black",SpreadsheetApp.BorderStyle.SOLID_THICK);
+  statisticsSheet.getRange(9,7,amountOfDays,1).setFontWeight("bold");
+  statisticsSheet.getRange(9,7,1,15).setBorder(true,true,true,true,true,true,"black",SpreadsheetApp.BorderStyle.SOLID_THICK);
+
+  for(var i = 0; i < amountOfDays; i++){
+    var rule = SpreadsheetApp.newConditionalFormatRule()
+      .setGradientMaxpoint("#FF0000")
+      .setGradientMidpointWithValue("#FFFF00", SpreadsheetApp.InterpolationType.PERCENT, "50")
+      .setGradientMinpoint("#008B00")
+      .setRanges([statisticsSheet.getRange(9+i,8,1,10)])
+      .build();
+
+    rules.push(rule)
+  }
+  for(var j = 0; j < 3; j++){
+    var rule = SpreadsheetApp.newConditionalFormatRule()
+      .setGradientMaxpoint("#FF0000")
+      .setGradientMidpointWithValue("#FFFF00", SpreadsheetApp.InterpolationType.PERCENT, "50")
+      .setGradientMinpoint("#008B00")
+      .setRanges([statisticsSheet.getRange(10,19+j,amountOfDays-1,1)])
+      .build();
+
+    rules.push(rule)
+  }
+  statisticsSheet.setConditionalFormatRules(rules);
 }
