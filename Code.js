@@ -6,7 +6,7 @@ var validPhases = ["Purification 1","Jormag","Primordus","Kralkatorrik","Zeitzau
     staticSheet = ss.getSheetByName('Setup und Co'),
     statisticsSheet = ss.getSheetByName('Statistics');
 
-/** Trigger to check that dps.reports are entered into the correct space and to automatically run writeDataIntoSpreadsheet when the input ios valid
+/** Trigger to check that dps.reports are entered into the correct space and to automatically run writeDataIntoSpreadsheet when the input is valid
  *  @param {*} e 
  */
 function editTrigger(e) {
@@ -496,3 +496,4 @@ function updateStatisticsLayout(amountOfPlayers,amountOfDays){
   }
   statisticsSheet.setConditionalFormatRules(rules);
 }
+
