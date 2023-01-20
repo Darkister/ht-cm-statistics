@@ -45,11 +45,10 @@ function editTrigger(e) {
       var cell = logSheet.getRange(e.range.getRow(),e.range.getColumn() + 1);
       cell.setValue("Wrong records found, check the entries or contact an admin");
     }
+    var amountOfPlayers = fillAllPlayersAccName(),
+          amountOfDays = fillFailedPhases();
+      updateStatisticsLayout(amountOfPlayers,amountOfDays);
   }
-
-  var amountOfPlayers = fillAllPlayersAccName(),
-      amountOfDays = fillFailedPhases();
-  updateStatisticsLayout(amountOfPlayers,amountOfDays);
 }
 
 /** Write Data of the Log into the Spreadsheet
@@ -64,7 +63,7 @@ function writeDataIntoSpreadsheet(row=2){
 
   for(var i = 0; i < logs.length; i++){
     if(!(i in values)){
-      values[i].push([]);
+      values.push([]);
     }
     try{
       var log = logs[i][0];
@@ -352,6 +351,7 @@ function fillAllPlayersAccName(){
   }
 
   fillPlayers.setValues(playerValues)
+    .setBorder(false,false,false,false,false,false)
     .setHorizontalAlignment("center")
     .setFontSize(11)
     .setFontFamily("Arial")
@@ -433,6 +433,7 @@ function fillFailedPhases(){
       statisticsValues[currentRow].push(jorFailes,priFailes,kraFailes,pu2Failes,morFailes,zhaFailes,pu3Failes,sw1Failes,pu4Failes,sw2Failes,"=SUM(H"+ String(currentRow+9) + ":Q" + String(currentRow+9) + ")",greenFailes,slamFailes,shwaveFailes);
       Logger.log(statisticsValues);
       statisticsRange.setValues(statisticsValues)
+        .setBorder(false,false,false,false,false,false)
         .setHorizontalAlignment("center")
         .setFontSize(11)
         .setFontFamily("Arial")
@@ -468,7 +469,7 @@ function updateStatisticsLayout(amountOfPlayers,amountOfDays){
   rules.push(ruleParticipation);
   rules.push(ruleFirstDeath);
 
-  // Layout settings for the Martix of Phases/Mechanics and Days
+  // Layout settings for the Matrix of Phases/Mechanics and Days
   statisticsSheet.getRange(9,7,amountOfDays,1).setBorder(true,true,true,true,true,true,"black",SpreadsheetApp.BorderStyle.SOLID_THICK);
   statisticsSheet.getRange(9,7,amountOfDays,1).setFontWeight("bold");
   statisticsSheet.getRange(9,7,1,15).setBorder(true,true,true,true,true,true,"black",SpreadsheetApp.BorderStyle.SOLID_THICK);
