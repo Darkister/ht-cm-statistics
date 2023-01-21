@@ -113,7 +113,8 @@ function writeDataIntoSpreadsheet(row=2){
     }
   }
   Logger.log(values);
-  valuesRange.setValues(values);
+  valuesRange.setValues(values)
+    .setBorder(true,true,true,true,true,null,"black",SpreadsheetApp.BorderStyle.SOLID);
 }
 
 /** Get data of a log as json
@@ -125,7 +126,7 @@ function apiFetch(permalink) {
     contentType: "application/json",
     muteHttpExceptions: true
   },
-      data = UrlFetchApp.fetch('https://dps.report/getJson?permalink=' + permalink, opt);
+    data = UrlFetchApp.fetch('https://dps.report/getJson?permalink=' + permalink, opt);
 
   data = data.getContentText();
   return JSON.parse(data);
