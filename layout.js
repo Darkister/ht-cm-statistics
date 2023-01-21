@@ -202,6 +202,7 @@ function createLogsLayout(){
  * 
  */
 function createMechanicsLayout(){
+    var rules = new Array();
     if(mechanicsSheet == null){
         ss.insertSheet('Mechanics',3);
         mechanicsSheet = ss.getSheetByName('Mechanics');
@@ -223,12 +224,13 @@ function createMechanicsLayout(){
             mechanicsValue[1 + (j * 10)][1 + i*3] = "AVG";
             mechanicsValue[1 + (j * 10)][2 + i*3] = "Total";
             if(j>0){
-                mechanicsValue[1 + (j * 10)][3 + i*3] = "'+-=";
+                mechanicsValue[1 + (j * 10)][3 + i*3] = "'+-~";
             }
             mechanicsSheet.getRange(1 + (j * 10), 2 + (i * 3),1,3).mergeAcross();
             mechanicsSheet.getRange(1 + (j * 10), 2 + (i * 3),2,3).setFontWeight("bold")
                 .setBorder(true,true,true,true,true,true,"black",SpreadsheetApp.BorderStyle.SOLID);
             mechanicsSheet.getRange(1 + (j * 10), 2 + (i * 3),7,3).setBorder(true,true,true,true,null,null,"black",SpreadsheetApp.BorderStyle.SOLID);
+            mechanicsSheet.getRange(3 + (j * 10), 2 + (i * 3),5,1).setNumberFormat("#,##0.000");
         }
         mechanicsValue[1 + (j * 10)][0] = "Mechanic";
         mechanicsValue[2 + (j * 10)][0] = "=Logs!$S$1";
@@ -238,7 +240,44 @@ function createMechanicsLayout(){
         mechanicsValue[6 + (j * 10)][0] = "=Logs!$W$1";
         mechanicsSheet.getRange(1 + (j * 10),1,7,1).setFontWeight("bold");
         mechanicsSheet.getRange(1 + (j * 10),1,7,1).setBorder(true,true,true,true,true,true,"black",SpreadsheetApp.BorderStyle.SOLID);
+
+        for(var r = 0; r < 5; r++){
+            var num = 3 + r + (j * 10);
+                ranges = new Array();
+            for(var c = 0; c < 10 ; c++){
+                ranges.push(mechanicsSheet.getRange(num,2 + (c * 3)));
+            }
+            var rule = SpreadsheetApp.newConditionalFormatRule()
+                .setGradientMaxpoint("#FF0000")
+                .setGradientMidpointWithValue("#FFFF00", SpreadsheetApp.InterpolationType.PERCENTILE, "50")
+                .setGradientMinpoint("#008B00")
+                .setRanges(ranges)
+                .build();
+      
+            rules.push(rule);
+        }        
     }
+
+    var ranges = new Array();
+    for(var a = 0; a < 10; a++){
+        ranges.push(mechanicsSheet.getRange(13,4 + (a * 3),5,1));
+        ranges.push(mechanicsSheet.getRange(23,4 + (a * 3),5,1));
+    }
+    var plusRule = SpreadsheetApp.newConditionalFormatRule()
+        .whenTextContains("+")
+        .setBackground("#B7E1CD")
+        .setRanges(ranges)
+        .build();
+    var minusRule = SpreadsheetApp.newConditionalFormatRule()
+        .whenTextContains("-")
+        .setBackground("#E67C73")
+        .setRanges(ranges)
+        .build();
+  
+    rules.push(plusRule);
+    rules.push(minusRule);
+
+    mechanicsSheet.setConditionalFormatRules(rules);
   
     mechanicsRange.setValues(mechanicsValue)
         .setFontFamily("Arial")

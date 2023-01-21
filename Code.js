@@ -4,6 +4,7 @@ var validPhases = ["Purification 1","Jormag","Primordus","Kralkatorrik","Zeitzau
     ss = SpreadsheetApp.getActiveSpreadsheet(),
     logSheet = ss.getSheetByName('Logs'),
     staticSheet = ss.getSheetByName('Setup und Co'),
+    mechanicSheet = ss.getSheetByName('Mechanics'),
     statisticsSheet = ss.getSheetByName('Statistics');
 
 /** Trigger to check that dps.reports are entered into the correct space and to automatically run writeDataIntoSpreadsheet when the input is valid
@@ -48,6 +49,7 @@ function editTrigger(e) {
     var amountOfPlayers = fillAllPlayersAccName(),
           amountOfDays = fillFailedPhases();
       updateStatisticsLayout(amountOfPlayers,amountOfDays);
+      fillMechanics();
   }
 }
 
@@ -498,3 +500,154 @@ function updateStatisticsLayout(amountOfPlayers,amountOfDays){
   statisticsSheet.setConditionalFormatRules(rules);
 }
 
+/** Fill the values for the Mechanics tab
+ * 
+ */
+function fillMechanics(){
+  var mechanicsRange = mechanicsSheet.getRange(1,2,27,30),
+      mechanicsValue = mechanicsRange.getValues();
+    
+  for(var j = 0; j < 3; j++){
+    var days = j == 0 ? -1 : j == 1 ? 4 : 1;
+    for(var i = 0; i < 10; i++){
+      var player = mechanicsValue[0 + (j * 10)][0 + (i * 3)];
+      mechanicsValue[2 + (j * 10)][1 + (i * 3)] = getAmountOfMechanicFailes(logSheet.getRange(2,19,logSheet.getLastRow() - 1,1).getValues(),player,days);
+      mechanicsValue[3 + (j * 10)][1 + (i * 3)] = getAmountOfMechanicFailes(logSheet.getRange(2,20,logSheet.getLastRow() - 1,1).getValues(),player,days);
+      mechanicsValue[4 + (j * 10)][1 + (i * 3)] = getAmountOfMechanicFailes(logSheet.getRange(2,21,logSheet.getLastRow() - 1,1).getValues(),player,days);
+      mechanicsValue[5 + (j * 10)][1 + (i * 3)] = getAmountOfMechanicFailes(logSheet.getRange(2,22,logSheet.getLastRow() - 1,1).getValues(),player,days);
+      mechanicsValue[6 + (j * 10)][1 + (i * 3)] = getAmountOfMechanicFailes(logSheet.getRange(2,23,logSheet.getLastRow() - 1,1).getValues(),player,days);
+
+      mechanicsValue[2 + (j * 10)][0 + (i * 3)] = avgFailsPerTry(player,mechanicsValue[2 + (j * 10)][1 + (i * 3)],"Jormag",days);
+      mechanicsValue[3 + (j * 10)][0 + (i * 3)] = avgFailsPerTry(player,mechanicsValue[3 + (j * 10)][1 + (i * 3)],"Jormag",days);
+      mechanicsValue[4 + (j * 10)][0 + (i * 3)] = avgFailsPerTry(player,mechanicsValue[4 + (j * 10)][1 + (i * 3)],"Primordus",days);
+      mechanicsValue[5 + (j * 10)][0 + (i * 3)] = avgFailsPerTry(player,mechanicsValue[5 + (j * 10)][1 + (i * 3)],"Kralkatorrik",days);
+      mechanicsValue[6 + (j * 10)][0 + (i * 3)] = avgFailsPerTry(player,mechanicsValue[6 + (j * 10)][1 + (i * 3)],"Mordremoth",days);
+      
+      if(j>0){
+        mechanicsValue[2 + (j * 10)][2 + (i * 3)] = mechanicsValue[2 + (j * 10)][0 + (i * 3)] < mechanicsValue[2 + ((j - 1) * 10)][0 + (i * 3)] ? "+" : mechanicsValue[2 + (j * 10)][0 + (i * 3)] == mechanicsValue[2 + ((j - 1) * 10)][0 + (i * 3)] ? "~" : mechanicsValue[2 + (j * 10)][1 + (i * 3)] == mechanicsValue[2 + ((j - 1) * 10)][1 + (i * 3)] ? "~" : "-";
+        mechanicsValue[3 + (j * 10)][2 + (i * 3)] = mechanicsValue[3 + (j * 10)][0 + (i * 3)] < mechanicsValue[3 + ((j - 1) * 10)][0 + (i * 3)] ? "+" : mechanicsValue[3 + (j * 10)][0 + (i * 3)] == mechanicsValue[3 + ((j - 1) * 10)][0 + (i * 3)] ? "~" : mechanicsValue[3 + (j * 10)][1 + (i * 3)] == mechanicsValue[3 + ((j - 1) * 10)][1 + (i * 3)] ? "~" : "-";
+        mechanicsValue[4 + (j * 10)][2 + (i * 3)] = mechanicsValue[4 + (j * 10)][0 + (i * 3)] < mechanicsValue[4 + ((j - 1) * 10)][0 + (i * 3)] ? "+" : mechanicsValue[4 + (j * 10)][0 + (i * 3)] == mechanicsValue[4 + ((j - 1) * 10)][0 + (i * 3)] ? "~" : mechanicsValue[4 + (j * 10)][1 + (i * 3)] == mechanicsValue[4 + ((j - 1) * 10)][1 + (i * 3)] ? "~" : "-";
+        mechanicsValue[5 + (j * 10)][2 + (i * 3)] = mechanicsValue[5 + (j * 10)][0 + (i * 3)] < mechanicsValue[5 + ((j - 1) * 10)][0 + (i * 3)] ? "+" : mechanicsValue[5 + (j * 10)][0 + (i * 3)] == mechanicsValue[5 + ((j - 1) * 10)][0 + (i * 3)] ? "~" : mechanicsValue[5 + (j * 10)][1 + (i * 3)] == mechanicsValue[5 + ((j - 1) * 10)][1 + (i * 3)] ? "~" : "-";
+        mechanicsValue[6 + (j * 10)][2 + (i * 3)] = mechanicsValue[6 + (j * 10)][0 + (i * 3)] < mechanicsValue[6 + ((j - 1) * 10)][0 + (i * 3)] ? "+" : mechanicsValue[6 + (j * 10)][0 + (i * 3)] == mechanicsValue[6 + ((j - 1) * 10)][0 + (i * 3)] ? "~" : mechanicsValue[6 + (j * 10)][1 + (i * 3)] == mechanicsValue[6 + ((j - 1) * 10)][1 + (i * 3)] ? "~" : "-";
+      }
+    }
+  }
+  mechanicsRange.setValues(mechanicsValue);
+}
+
+/** Calculate amount of mechanic fails
+ * @param {any[][]} range  the range of data
+ * @param {String} player  the player who failed the mechanic
+ * @param {Integer} days   [Optional] calculate only the last x days
+ * @return {Integer}       returns a number
+ */
+function getAmountOfMechanicFailes(range,player,days=-1){
+  var counter = 0;
+  if(days==-1){
+    for(var i = 0; i < range.length; i++){
+      counter += occurrences(range[i],player);
+    }
+  }
+  else{
+    var dates = logSheet.getRange(2,1,logSheet.getLastRow()-1,1).getValues(),
+        players = logSheet.getRange(2,8,logSheet.getLastRow()-1,10).getValues();
+    for(var i = dates.length - 1; i >= 0; i--){
+      if(days > 0){
+        if(dates[i][0] == ""){
+          for(var p = 0; p < players[i].length; p++){
+            if(players[i][p] == player){
+              counter += occurrences(range[i],player);
+              break;
+            }
+          }
+        }
+        else{
+          for(var p = 0; p < players[i].length; p++){
+            if(players[i][p] == player){
+              counter += occurrences(range[i],player);
+              days--;
+              break;
+            }
+          }          
+        }
+      }
+      else break;
+    }
+  }
+
+  return counter;
+}
+
+/** Function that count occurrences of a substring in a string;
+ * @param {String} string               The string
+ * @param {String} subString            The sub string to search for
+ * @param {Boolean} [allowOverlapping]  Optional. (Default:false)
+ * 
+ * @author Vitim.us https://gist.github.com/victornpb/7736865
+ * @see Unit Test https://jsfiddle.net/Victornpb/5axuh96u/
+ * @see https://stackoverflow.com/a/7924240/938822
+ */
+function occurrences(string, subString, allowOverlapping) {
+
+  string += "";
+  subString += "";
+  if (subString.length <= 0) return (string.length + 1);
+
+  var n = 0,
+      pos = 0,
+      step = allowOverlapping ? 1 : subString.length;
+
+  while (true) {
+      pos = string.indexOf(subString, pos);
+      if (pos >= 0) {
+          ++n;
+          pos += step;
+      } else break;
+  }
+  return n;
+}
+
+/** Calculate the average fails per try
+ * @param {String} player       the player who failed the mechanic
+ * @param {Integer} totalValue  the amount of fails
+ * @param {String} phase        Minimum reached phase
+ * @param {Integer} days        [Optional] calculate only the last x days (Default:-1)
+ * @return {Integer}            returns a number
+ */
+function avgFailsPerTry(player,totalValue,phase,days=-1){
+  var allowedPhases = ["Purification 1","Jormag","Primordus","Kralkatorrik","Zeitzauberer der Leere","Purification 2","Mordremoth","Zhaitan","Void Saltspray Dragon","Purification 3","Soo-Won 1","Purification 4","Soo-Won 2"];
+
+  while(phase != allowedPhases[0]){
+    allowedPhases.shift();
+  }
+  var dates = logSheet.getRange(2,1,logSheet.getLastRow()-1,1).getValues(),
+      phases = logSheet.getRange(2,4,logSheet.getLastRow()-1,1).getValues(),
+      players = logSheet.getRange(2,8,logSheet.getLastRow()-1,10).getValues(),
+      counter = 0;
+
+  if(days==-1){
+    for(var i = 0; i < phases.length; i++){
+      if(allowedPhases.includes(phases[i][0]) && players[i].includes(player)){
+        counter++;
+      }
+    }
+  }
+  else{
+    for(var i = dates.length - 1; i >= 0; i--){
+      if(days > 0){
+        if(dates[i][0] == "" && allowedPhases.includes(phases[i][0]) && players[i].includes(player)){
+          counter++;
+        }
+        else if(allowedPhases.includes(phases[i][0]) && players[i].includes(player)){
+          counter++;
+          days--;
+        }
+        else if(dates[i][0] != "" && players[i].includes(player)){
+          days--; 
+        }
+      }
+      else break;
+    }
+  }
+  return totalValue/counter;
+}
