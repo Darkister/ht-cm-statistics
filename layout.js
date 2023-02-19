@@ -147,7 +147,7 @@ function createLogsLayout(){
         ss.insertSheet('Logs',2);
         logSheet = ss.getSheetByName('Logs');
     }
-    var logRange = logSheet.getRange(1,1,1,23),
+    var logRange = logSheet.getRange(1,1,1,24),
         logValue = logRange.getValues();
 
     logValue[0][0] = "Date";
@@ -165,6 +165,7 @@ function createLogsLayout(){
     logValue[0][20] = "Hit by Primordus Slam";
     logValue[0][21] = "Hit by Crystal Barrage";
     logValue[0][22] = "Hit by Mordremoth Shockwave";
+    logValue[0][23] = "Recieved Debilitated debuff";
 
     logSheet.getRange(1,7,1,10).mergeAcross();
     logSheet.getRange(2,1,logSheet.getMaxRows()-1,1)
@@ -211,7 +212,7 @@ function createMechanicsLayout(){
     while(mechanicsSheet.getMaxColumns() < 31){
         mechanicsSheet.insertColumns(mechanicsSheet.getMaxColumns(), 1)
     }
-    var mechanicsRange = mechanicsSheet.getRange(1,1,27,31),
+    var mechanicsRange = mechanicsSheet.getRange(1,1,28,31),
         mechanicsValue = mechanicsRange.getValues();
 
     mechanicsValue[0][0] = "Mechanics failed OverAll";  
@@ -238,8 +239,9 @@ function createMechanicsLayout(){
         mechanicsValue[4 + (j * 10)][0] = "=Logs!$U$1";
         mechanicsValue[5 + (j * 10)][0] = "=Logs!$V$1";
         mechanicsValue[6 + (j * 10)][0] = "=Logs!$W$1";
-        mechanicsSheet.getRange(1 + (j * 10),1,7,1).setFontWeight("bold");
-        mechanicsSheet.getRange(1 + (j * 10),1,7,1).setBorder(true,true,true,true,true,true,"black",SpreadsheetApp.BorderStyle.SOLID);
+        mechanicsValue[7 + (j * 10)][0] = "=Logs!$X$1";
+        mechanicsSheet.getRange(1 + (j * 10),1,8,1).setFontWeight("bold");
+        mechanicsSheet.getRange(1 + (j * 10),1,8,1).setBorder(true,true,true,true,true,true,"black",SpreadsheetApp.BorderStyle.SOLID);
 
         for(var r = 0; r < 5; r++){
             var num = 3 + r + (j * 10);
