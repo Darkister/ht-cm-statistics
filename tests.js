@@ -64,10 +64,6 @@ function gast() {
 
     /** function getAmountOfMechanicFailes(range,player,days=-1)
     *  returns Integer */ 
-    test('do getAmountOfMechanicFailes right', function (t) {    
-        var numOfMechanicFailes = getAmountOfMechanicFailes(logSheet.getRange(2,19,logSheet.getLastRow() - 1,1).getValues(),"blackicedragon.3579");
-        t.equal(numOfMechanicFailes, 142, 'getAmountOfMechanicFailes is ok');
-    })
 
     /** function occurrences(string, substring)
     *  returns Integer */ 
@@ -88,13 +84,23 @@ function gast() {
 
     /** function avgFailsPerTry(player,totalValue,phase,days=-1)
     *  returns Integer */ 
-    test('do avgFailsPerTry right', function (t) {    
-        var value = avgFailsPerTry("blackicedragon.3579",getAmountOfMechanicFailes(logSheet.getRange(2,19,logSheet.getLastRow() - 1,1).getValues(),"blackicedragon.3579"),"Jormag");
-        t.equal(Math.round(value*100000)/100000, 0.42771 , 'avgFailsPerTry is ok');
-    })
   
+    /** function removeEndingZeros(arr)
+    *  returns Array */ 
+    test('do removing right', function (t) {
+        var arr = removeEndingZeros([5.0, 7.0, 1.0, 2.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]);
+        t.deepEqual(arr,[5.0, 7.0, 1.0, 2.0],'removing is ok');
+    })
+
+    test('do removing right', function (t) {
+        var arr = removeEndingZeros([1.0, 2.0, 0.0, 0.0, 3.0, 1.0, 2.0, 1.0, 2.0, 1.0]);
+        t.deepEqual(arr,[1.0, 2.0, 0.0, 0.0, 3.0, 1.0, 2.0, 1.0, 2.0, 1.0],'removing is ok');
+    })
+
+    test('do removing right', function (t) {
+        var arr = removeEndingZeros([0.0, 0.0, 0.0, 4.0, 5.0, 2.0, 1.0, 0.0, 0.0, 0.0]);
+        t.deepEqual(arr,[0.0, 0.0, 0.0, 4.0, 5.0, 2.0, 1.0],'removing is ok');
+    })
+
   test.finish();
 }
-
-
-

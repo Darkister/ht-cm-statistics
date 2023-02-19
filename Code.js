@@ -1,5 +1,4 @@
-var validPhases = ["Purification 1","Jormag","Primordus","Kralkatorrik","Zeitzauberer der Leere","Purification 2","Mordremoth","Zhaitan","Void Saltspray Dragon","Purification 3","Soo-Won 1","Purification 4","Soo-Won 2"],
-    targetValues = ["Heart 1","The JormagVoid","The PrimordusVoid","The KralkatorrikVoid","Zeitzauberer der Leere","Heart 2","The MordremothVoid","The ZhaitanVoid","Void Saltspray Dragon","Heart 3","The SooWonVoid","Heart 4"],
+var targetValues = ["Heart 1","The JormagVoid","The PrimordusVoid","The KralkatorrikVoid","Zeitzauberer der Leere","The MordremothVoid","The ZhaitanVoid","Leere-Salzgischtdrachen","The SooWonVoid","Heart 4"],
     mechanicsToCheck = ["Void.D","J.Breath.H","Slam.H","Barrage.H","ShckWv.H"],
     ss = SpreadsheetApp.getActiveSpreadsheet(),
     logSheet = ss.getSheetByName('Logs'),
@@ -140,12 +139,25 @@ function apiFetch(permalink) {
  */
 function getLatestValidPhase(phases){
   var phase = phases[phases.length -1].name;
-  if(validPhases.includes(phase)){
+  if (phase == "Purification 1" || phase == "Jormag" || phase == "Primordus" || phase == "Kralkatorrik" || phase == "Purification 2" || phase == "Mordremoth" || phase == "Zhaitan" || phase == "Purification 3" || phase == "Soo-Won 1" || phase == "Soo-Won 2" || phase == "Purification 4"){
     return phase;
   }
-  else{
-    return getLatestValidPhase(phases.slice(0,phases.length -1));
+  if(phase ==  "Heart 1 Breakbar 1"){
+    return "Purification 1";
   }
+  else if(phase == "Zeitzauberer der Leere" || phase == "Heart 2 Breakbar 1"){
+    return "Purification 2";
+  }
+  else if(phase == "Leere-Salzgischtdrachen" || phase == "Leere-Salzgischtdrachen Breakbar 1" || phase == "Heart 3 Breakbar 1"){
+    return "Purification 3";
+  }
+  else if(phase == "Soo-Won"){
+    return "Soo-Won 1";
+  }
+  else if(phase == "Leere-Vernichter" || phase == "Leere-Goliath"){
+    return "Soo-Won 2";
+  }
+  return phase;
 }
 
 /** Checks the rest hp of the boss where the fight ends
@@ -168,29 +180,23 @@ function bossHPendPhase(json, boss){
   else if(boss == "Kralkatorrik"){
     searchName = targetValues[3];
   }
-  else if(boss == "Zeitzauberer der Leere"){
+  else if(boss == "Purification 2"){
     searchName = targetValues[4];
   }
-  else if(boss == "Purification 2"){
+  else if(boss == "Mordremoth"){
     searchName = targetValues[5];
   }
-  else if(boss == "Mordremoth"){
+  else if(boss == "Zhaitan"){
     searchName = targetValues[6];
   }
-  else if(boss == "Zhaitan"){
+  else if(boss == "Purification 3"){
     searchName = targetValues[7];
   }
-  else if(boss == "Salzgischtdrache der Leere"){
+  else if(boss == "Soo-Won 1" || boss == "Soo-Won 2"){
     searchName = targetValues[8];
   }
-  else if(boss == "Purification 3"){
-    searchName = targetValues[9];
-  }
-  else if(boss == "Soo-Won"){
-    searchName = targetValues[10];
-  }
   else if(boss == "Purification 4"){
-    searchName = targetValues[10];
+    searchName = targetValues[9];
   }
 
   for(var i = 0; i < targets.length; i++){
@@ -440,6 +446,7 @@ function fillFailedPhases(){
         .setHorizontalAlignment("center")
         .setFontSize(11)
         .setFontFamily("Arial")
+        .setFontWeight("bold")
         .setBorder(true,true,true,true,null,null,"black",SpreadsheetApp.BorderStyle.SOLID_THICK);
       return statisticsValues.length;
     }
@@ -453,7 +460,9 @@ function updateStatisticsLayout(amountOfPlayers,amountOfDays){
   // Layout settings for the list of players including the Participation and first Deaths
   statisticsSheet.getRange(9,1,amountOfPlayers,1).setBorder(null,null,null,true,null,null,"black",SpreadsheetApp.BorderStyle.SOLID_THICK);
   statisticsSheet.getRange(9,3,amountOfPlayers,1).setBorder(null,null,null,true,null,null,"black",SpreadsheetApp.BorderStyle.SOLID_THICK);
+  statisticsSheet.getRange(9,2,amountOfPlayers,1).setNumberFormat("#,##0");
   statisticsSheet.getRange(9,3,amountOfPlayers,1).setNumberFormat("#0.00%");
+  statisticsSheet.getRange(9,4,amountOfPlayers,1).setNumberFormat("#,##0");
   statisticsSheet.getRange(9,5,amountOfPlayers,1).setNumberFormat("#0.00%");
 
   var ruleParticipation = SpreadsheetApp.newConditionalFormatRule()
@@ -473,19 +482,26 @@ function updateStatisticsLayout(amountOfPlayers,amountOfDays){
   rules.push(ruleFirstDeath);
 
   // Layout settings for the Matrix of Phases/Mechanics and Days
-  statisticsSheet.getRange(9,7,amountOfDays,1).setBorder(true,true,true,true,true,true,"black",SpreadsheetApp.BorderStyle.SOLID_THICK);
-  statisticsSheet.getRange(9,7,amountOfDays,1).setFontWeight("bold");
+  statisticsSheet.getRange(9,7,amountOfDays,1).setBorder(true,true,true,true,true,true,"black",SpreadsheetApp.BorderStyle.SOLID_THICK)
+    .getRange(9,7,amountOfDays,1).setFontWeight("bold");
+  statisticsSheet.getRange(9,8,amountOfDays,10).setBackground("#BEBEBE")    
+    .setFontWeight("normal");
+  statisticsSheet.getRange(9,8,amountOfDays,14).setNumberFormat("#,##0");
   statisticsSheet.getRange(9,7,1,15).setBorder(true,true,true,true,true,true,"black",SpreadsheetApp.BorderStyle.SOLID_THICK);
 
   for(var i = 0; i < amountOfDays; i++){
+    var values = removeEndingZeros(statisticsSheet.getRange(9+i,8,1,10).getValues()[0]);
+    Logger.log(values);
+
     var rule = SpreadsheetApp.newConditionalFormatRule()
       .setGradientMaxpoint("#FF0000")
       .setGradientMidpointWithValue("#FFFF00", SpreadsheetApp.InterpolationType.PERCENT, "50")
       .setGradientMinpoint("#008B00")
-      .setRanges([statisticsSheet.getRange(9+i,8,1,10)])
+      .setRanges([statisticsSheet.getRange(9+i,8,1,values.length)])
       .build();
 
     rules.push(rule)
+    statisticsSheet.getRange(9+i,8,1,values.length).setFontWeight("bold");
   }
   for(var j = 0; j < 3; j++){
     var rule = SpreadsheetApp.newConditionalFormatRule()
@@ -496,8 +512,19 @@ function updateStatisticsLayout(amountOfPlayers,amountOfDays){
       .build();
 
     rules.push(rule)
+    statisticsSheet.getRange(10,19+j,amountOfDays-1,1).setFontWeight("bold");
   }
   statisticsSheet.setConditionalFormatRules(rules);
+}
+
+/** Remove ending zeros from array
+ * 
+ */
+function removeEndingZeros(arr){
+  while(arr[arr.length-1] === 0){ // While the last element is a 0,
+    arr.pop();                    // Remove that last element
+  }               
+  return arr;
 }
 
 /** Fill the values for the Mechanics tab
@@ -543,24 +570,40 @@ function fillMechanics(){
  * @param {Integer} days   [Optional] calculate only the last x days
  * @return {Integer}       returns a number
  */
-function getAmountOfMechanicFailes(range, player, days = -1) {
-  let counter = 0;
-  let dates = logSheet.getRange(2, 1, logSheet.getLastRow() - 1, 1).getValues();
-  let players = logSheet.getRange(2, 8, logSheet.getLastRow() - 1, 10).getValues();
-  let data = dates.map((date, index) => {
-      return {
-          date: date[0],
-          players: players[index],
-          range: range[index]
-      }
-  });
-  if (days === -1) {
-      counter = data.reduce((acc, curr) => acc + occurrences(curr.range, player), 0);
-  } else {
-      counter = data
-          .filter(d => d.date === "" || days-- > 0)
-          .reduce((acc, curr) => acc + occurrences(curr.range, player), 0);
+function getAmountOfMechanicFailes(range,player,days=-1){
+  var counter = 0;
+  if(days==-1){
+    for(var i = 0; i < range.length; i++){
+      counter += occurrences(range[i],player);
+    }
   }
+  else{
+    var dates = logSheet.getRange(2,1,logSheet.getLastRow()-1,1).getValues(),
+        players = logSheet.getRange(2,8,logSheet.getLastRow()-1,10).getValues();
+    for(var i = dates.length - 1; i >= 0; i--){
+      if(days > 0){
+        if(dates[i][0] == ""){
+          for(var p = 0; p < players[i].length; p++){
+            if(players[i][p] == player){
+              counter += occurrences(range[i],player);
+              break;
+            }
+          }
+        }
+        else{
+          for(var p = 0; p < players[i].length; p++){
+            if(players[i][p] == player){
+              counter += occurrences(range[i],player);
+              days--;
+              break;
+            }
+          }          
+        }
+      }
+      else break;
+    }
+  }
+
   return counter;
 }
 
@@ -580,35 +623,39 @@ function occurrences(string, substring) {
  * @param {Integer} days        [Optional] calculate only the last x days (Default:-1)
  * @return {Integer}            returns a number
  */
-function avgFailsPerTry(player, totalValue, phase, days = -1) {
-  const allowedPhases = ["Purification 1","Jormag","Primordus","Kralkatorrik","Zeitzauberer der Leere","Purification 2","Mordremoth","Zhaitan","Void Saltspray Dragon","Purification 3","Soo-Won 1","Purification 4","Soo-Won 2"];
-  const startIndex = allowedPhases.indexOf(phase);
-  const allowedPhasesFromPhase = allowedPhases.slice(startIndex);
-  const playerSet = new Set();
+function avgFailsPerTry(player,totalValue,phase,days=-1){
+  var allowedPhases = ["Purification 1","Jormag","Primordus","Kralkatorrik","Purification 2","Mordremoth","Zhaitan","Purification 3","Soo-Won 1","Purification 4","Soo-Won 2"];
 
-  var counter = 0;
-  var lastRow = logSheet.getLastRow();
-  var date = logSheet.getRange(2,1,lastRow-1,1).getValues();
-  var phase = logSheet.getRange(2,4,lastRow-1,1).getValues();
-  var players = logSheet.getRange(2,8,lastRow-1,10).getValues();
+  while(phase != allowedPhases[0]){
+    allowedPhases.shift();
+  }
+  var dates = logSheet.getRange(2,1,logSheet.getLastRow()-1,1).getValues(),
+      phases = logSheet.getRange(2,4,logSheet.getLastRow()-1,1).getValues(),
+      players = logSheet.getRange(2,8,logSheet.getLastRow()-1,10).getValues(),
+      counter = 0;
 
-  for (let i = 0; i < date.length; i++) {
-    if (allowedPhasesFromPhase.includes(phase[i][0]) && players[i].includes(player)) {
-      playerSet.add(player)
-      counter++;
+  if(days==-1){
+    for(var i = 0; i < phases.length; i++){
+      if(allowedPhases.includes(phases[i][0]) && players[i].includes(player)){
+        counter++;
+      }
     }
   }
-
-  if(days !== -1){
-    for (let i = date.length-1; i >=0; i--) {
-      if (days > 0) {
-        if (date[i][0] !== "" && playerSet.has(players[i])) {
-          counter--;
+  else{
+    for(var i = dates.length - 1; i >= 0; i--){
+      if(days > 0){
+        if(dates[i][0] == "" && allowedPhases.includes(phases[i][0]) && players[i].includes(player)){
+          counter++;
+        }
+        else if(allowedPhases.includes(phases[i][0]) && players[i].includes(player)){
+          counter++;
           days--;
         }
-      } else {
-        break;
+        else if(dates[i][0] != "" && players[i].includes(player)){
+          days--; 
+        }
       }
+      else break;
     }
   }
   return totalValue/counter;
