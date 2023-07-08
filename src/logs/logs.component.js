@@ -1,26 +1,9 @@
 /** Write Data of the Log into the Spreadsheet
  *  @param {Integer} row  [OPTIONAL] defines where to start with the data writing
  */
-function writeDataIntoSpreadsheet(row = 2) {
-  var firstInput = logSheet.getRange(row, 2).getValue(),
-    logsHelper,
-    logs;
-
-  if (occurrences(firstInput, "https://dps.report/") > 1) {
-    logsHelper = firstInput.split(" ");
-    Logger.log(logsHelper);
-    logs = new Array(logsHelper.length);
-    for (var i = 0; i < logsHelper.length; i++) {
-      logs[i] = new Array(logsHelper[i]);
-      Logger.log(logs);
-    }
-  } else {
-    logs = logSheet
-      .getRange(row, 2, logSheet.getLastRow() - row + 1, 1)
-      .getValues();
-  }
-
-  var date = "",
+function writeDataIntoSpreadsheet(logs) {
+  var row = logSheet.getLastRow(),
+    date = "",
     cellsWithSameDate = 0,
     valuesRange = logSheet.getRange(row, 1, logs.length, 28),
     values = new Array();
@@ -30,7 +13,7 @@ function writeDataIntoSpreadsheet(row = 2) {
       values.push([]);
     }
     try {
-      var log = logs[i][0];
+      var log = logs[i];
       Logger.log("Next Log to calculate: " + log);
       var json = apiFetch(log),
         dateOfLog = getDayOfLog(json);
@@ -53,7 +36,7 @@ function writeDataIntoSpreadsheet(row = 2) {
         cellsWithSameDate++;
       }
       values[i].push(dateOfLog);
-      values[i].push(logs[i][0]);
+      values[i].push(log);
       values[i].push(json.duration);
       var endphase = getLatestValidPhase(json.phases);
       values[i].push(endphase);
@@ -337,4 +320,26 @@ function allPlayerDownOnFirstDeath(json) {
   } catch {
     return downs.length >= 10 && firstDeathTime > lastDownTime;
   }
+}
+
+/** Get all players who recieved debilitated Debuff
+ *
+ */
+function getDebilitatedDebuff(json) {
+  var players = json.players;
+  var hits = "";
+  for (var i = 0; i < players.length; i++) {
+    var buffs = players[i].buffUptimes;
+    var debilitated = buffs.find(({ id }) => id == 67972);
+    try {
+      var states = debilitated.states;
+      Logger.log(states);
+      for (var s = 0; s < states.length - 1; s++) {
+        if (states[s][1] <= states[s + 1][1]) {
+          hits = hits + players[i].account;
+        }
+      }
+    } catch {}
+  }
+  return hits;
 }
