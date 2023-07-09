@@ -3,7 +3,7 @@
  */
 function removeEndingZeros(arr){
     while(arr[arr.length-1] === 0){ // While the last element is a 0,
-        arr.pop();                    // Remove that last element
+        arr.pop();                  // Remove that last element
     }               
     return arr;
 }
