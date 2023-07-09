@@ -60,9 +60,14 @@ function editTrigger(e) {
       formatedLogs = formatLogs(value);
       Logger.log(formatedLogs);
       filteredLogs = preFilterLogs(formatedLogs);
-      writeDataIntoSpreadsheet(filteredLogs);
-      repairSettingsLayout();
-      statusCell.setValue("Calculation complete");
+      if (filteredLogs.length > 0) {
+        writeDataIntoSpreadsheet(filteredLogs);
+        repairSettingsLayout();
+        statusCell.setValue("Calculation complete");
+      } else {
+        repairSettingsLayout();
+        statusCell.setValue("Nothing to Do, Check the Info Box");
+      }
     } else {
       statusCell.setValue(
         "Wrong records found, check the entries or contact an admin"
@@ -94,7 +99,7 @@ function formatLogs(logsInput) {
     }
   } else {
     logs = new Array(1);
-    logs[1] = logsInput;
+    logs[0] = logsInput;
   }
   var infoRange = settingsSheet.getRange(3, 8, 11, 4),
     infoValue = infoRange.getValues();
@@ -108,16 +113,24 @@ function formatLogs(logsInput) {
  *
  */
 function preFilterLogs(logsInput) {
-  var calculatedLogs = logSheet
-      .getRange(2, 1, logSheet.getLastRow() - 1, 1)
-      .getValues(),
+  var calculatedLogs,
     outfilteredLogs = new Array(),
     leftLogs = new Array();
-  Logger.log(calculatedLogs);
-  for (i = 0; i < logsInput.length; i++) {
-    if (calculatedLogs.includes(logsInput[i])) {
-      outfilteredLogs.push(logsInput[i]);
-    } else {
+  try {
+    calculatedLogs = logSheet
+      .getRange(2, 2, logSheet.getLastRow() - 1, 1)
+      .getValues();
+    Logger.log(calculatedLogs);
+    for (i = 0; i < logsInput.length; i++) {
+      if (calculatedLogs.some((arr) => arr.includes(logsInput[i]))) {
+        outfilteredLogs.push(logsInput[i]);
+      } else {
+        leftLogs.push(logsInput[i]);
+      }
+    }
+  } catch {
+    Logger.log("Logs are empty, Continue with fresh data");
+    for (i = 0; i < logsInput.length; i++) {
       leftLogs.push(logsInput[i]);
     }
   }
@@ -125,11 +138,19 @@ function preFilterLogs(logsInput) {
   var infoRange = settingsSheet.getRange(3, 8, 11, 4),
     infoValue = infoRange.getValues();
 
-  infoValue[0][0] =
-    "This Logs already inside the Spreadsheet and will be ignored:\n" +
-    outfilteredLogs +
-    "\nContinue with this logs:\n" +
-    leftLogs;
+  if (outfilteredLogs.length == 0) {
+    infoValue[0][0] = "Continue with this logs:\n" + leftLogs;
+  } else if (leftLogs.length == 0) {
+    infoValue[0][0] =
+      "This Logs already inside the Spreadsheet and will be ignored:\n" +
+      outfilteredLogs;
+  } else {
+    infoValue[0][0] =
+      "This Logs already inside the Spreadsheet and will be ignored:\n" +
+      outfilteredLogs +
+      "\nContinue with this logs:\n" +
+      leftLogs;
+  }
   infoRange.setValues(infoValue);
   return leftLogs;
 }
