@@ -84,15 +84,10 @@ function editTrigger(e) {
  *
  */
 function formatLogs(logsInput) {
-  var logsHelper, splitter;
-  if (logsInput.includes("\n")) {
-    splitter = "\n";
-  } else {
-    splitter = " ";
-  }
+  var logsHelper;
 
   if (occurrences(logsInput, "https://dps.report/") > 1) {
-    logsHelper = logsInput.split(splitter);
+    logsHelper = logsInput.replace(/(\r\n|\r|\n)/g, " ").split(" ");
     logs = new Array(logsHelper.length);
     for (var i = 0; i < logsHelper.length; i++) {
       logs[i] = logsHelper[i];
