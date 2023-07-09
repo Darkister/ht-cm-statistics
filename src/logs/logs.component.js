@@ -2,7 +2,7 @@
  *  @param {Integer} row  [OPTIONAL] defines where to start with the data writing
  */
 function writeDataIntoSpreadsheet(logs) {
-  var row = logSheet.getLastRow(),
+  var row = logSheet.getLastRow() + 1,
     date = "",
     cellsWithSameDate = 0,
     valuesRange = logSheet.getRange(row, 1, logs.length, 28),

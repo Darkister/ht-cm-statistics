@@ -106,6 +106,7 @@ function repairSettingsLayout() {
       "black",
       SpreadsheetApp.BorderStyle.SOLID
     )
-    .setBackground(lightGray);
+    .setBackground(lightGray)
+    .clearContent();
   settingsSheet.getRange(4, 3).setVerticalAlignment("top");
 }
