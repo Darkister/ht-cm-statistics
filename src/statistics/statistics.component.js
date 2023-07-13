@@ -150,21 +150,21 @@ function fillFailedPhases() {
       .getRange(1, 1, logSheet.getLastRow(), logSheet.getLastColumn())
       .getValues(),
     statisticsValues = new Array(),
-    currentRow =
-      (jorFailes =
-      priFailes =
-      kraFailes =
-      pu2Failes =
-      morFailes =
-      zhaFailes =
-      pu3Failes =
-      sw1Failes =
-      pu4Failes =
-      sw2Failes =
-      greenFailes =
-      slamFailes =
-      shwaveFailes =
-        0);
+    date,
+    currentRow = 0,
+    jorFailes = 0,
+    priFailes = 0,
+    kraFailes = 0,
+    pu2Failes = 0,
+    morFailes = 0,
+    zhaFailes = 0,
+    pu3Failes = 0,
+    sw1Failes = 0,
+    pu4Failes = 0,
+    sw2Failes = 0,
+    greenFailes = 0,
+    slamFailes = 0,
+    shwaveFailes = 0;
 
   if (!(0 in statisticsValues)) {
     statisticsValues.push([]);
@@ -188,7 +188,8 @@ function fillFailedPhases() {
   );
 
   for (var i = 1; i < logValues.length; i++) {
-    if (logValues[i][0] != "") {
+    if (date == null || logValues[i][0].getDate() != date.getDate()) {
+      date = logValues[i][0];
       if (!(currentRow + 1 in statisticsValues)) {
         statisticsValues.push([]);
       }
@@ -226,7 +227,7 @@ function fillFailedPhases() {
     }
 
     try {
-      if (logValues[i + 1][0] != "") {
+      if (logValues[i + 1][0].getDate() != date.getDate()) {
         statisticsValues[currentRow].push(
           jorFailes,
           priFailes,
