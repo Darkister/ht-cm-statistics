@@ -3,8 +3,6 @@
  */
 function writeDataIntoSpreadsheet(logs) {
   var row = logSheet.getLastRow() + 1,
-    date = "",
-    cellsWithSameDate = 0,
     valuesRange = logSheet.getRange(row, 1, logs.length, 28),
     values = new Array();
 
@@ -15,27 +13,9 @@ function writeDataIntoSpreadsheet(logs) {
     try {
       var log = logs[i];
       Logger.log("Next Log to calculate: " + log);
-      var json = apiFetch(log),
-        dateOfLog = getDayOfLog(json);
-      if (date == "") {
-        date = dateOfLog;
-        cellsWithSameDate++;
-      } else if (date != dateOfLog) {
-        date = dateOfLog;
-        cellsWithSameDate = 1;
-      } else if (date == dateOfLog) {
-        if (
-          !logSheet
-            .getRange(i + row, 1, cellsWithSameDate + 1, 1)
-            .isPartOfMerge()
-        ) {
-          logSheet
-            .getRange(i + row - cellsWithSameDate, 1, cellsWithSameDate + 1, 1)
-            .mergeVertically();
-        }
-        cellsWithSameDate++;
-      }
-      values[i].push(dateOfLog);
+      var json = apiFetch(log);
+
+      values[i].push(getDayOfLog(json));
       values[i].push(log);
       values[i].push(json.duration);
       var endphase = getLatestValidPhase(json.phases);
@@ -56,21 +36,16 @@ function writeDataIntoSpreadsheet(logs) {
       values[i].push(allPlayerDownOnFirstDeath(json));
     } catch (e) {
       console.error("apiFetch yielded error: " + e);
-      Logger.log("Continue with Dummy data");
-      for (var c = 0; c < values[0].length; c++) {
-        if (c != 1) {
-          values[i][c] = i + " / " + c;
-        }
-      }
+      Logger.log("Skip log");
     }
   }
   Logger.log(values);
   valuesRange
     .setValues(values)
     .setBorder(
+      null,
       true,
-      true,
-      true,
+      null,
       true,
       true,
       null,

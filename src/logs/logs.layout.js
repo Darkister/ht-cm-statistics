@@ -59,7 +59,8 @@ function createLogsLayout() {
       true,
       "black",
       SpreadsheetApp.BorderStyle.SOLID_THICK
-    );
+    )
+    .createFilter();
 
   logSheet
     .setColumnWidths(1, 1, 80)
