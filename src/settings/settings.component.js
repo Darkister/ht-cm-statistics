@@ -99,9 +99,12 @@ function formatLogs(logsInput) {
   var infoRange = settingsSheet.getRange(3, 8, 11, 4),
     infoValue = infoRange.getValues();
 
-  infoValue[0][0] = "Received Logs: " + logs;
+  var clearLogs = logs.filter(
+    (value) => !(value == [] || value == "" || value == {})
+  );
+  infoValue[0][0] = "Received Logs: " + clearLogs;
   infoRange.setValues(infoValue);
-  return logs;
+  return clearLogs;
 }
 
 /**
