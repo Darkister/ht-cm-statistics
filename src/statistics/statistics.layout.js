@@ -26,7 +26,7 @@ function createStatisticsLayout() {
 
   statisticsValue[4][0] = "Tries ended on Shockwave:";
   statisticsValue[4][1] =
-    "=SUMME(MAP(U10:U; S10:S;LAMBDA(valA;valB;MIN(valA;valB))))/R9";
+    "=SUM(MAP(U10:U; S10:S;LAMBDA(valA;valB;MIN(valA;valB))))/R9";
 
   statisticsValue[6][0] = "Total Count of valid Logs:";
   statisticsValue[6][1] = "Participation";
