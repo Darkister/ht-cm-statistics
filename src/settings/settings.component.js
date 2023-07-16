@@ -5,20 +5,17 @@ function editPlayersToViewTrigger(e) {
   if (
     e &&
     e.range &&
-    e.range.getRow() === 3 &&
+    e.range.getRow() === 2 &&
     e.range.getColumn() === 3 &&
     e.range.getSheet().getName() === "Settings"
   ) {
-    var playersToView = settingsSheet.getRange(3, 3).getValue();
+    var playersToView = settingsSheet.getRange(2, 3).getValue(),
+      statusCell = settingsSheet.getRange(13, 3);
 
     updateSetupLayout(playersToView);
 
-    SpreadsheetApp.getActiveSpreadsheet().toast(
-      "Players to view is set to " +
-        playersToView +
-        ". Setup and Co will be updated.",
-      "Updated Players to view",
-      5
+    statusCell.setValue(
+      "Updated Players to view to " + playersToView.toString()
     );
   }
 }
@@ -32,21 +29,15 @@ function editTrigger(e) {
     value = e.range.getValue(),
     statusCell = settingsSheet.getRange(13, 3),
     formatedLogs,
+    playersToView = settingsSheet.getRange(2, 3).getValue(),
+    players = staticSheet.getRange(2, 2, playersToView, 1).getValues(),
+    infoRange = settingsSheet.getRange(3, 8, 11, 4),
+    infoValue = infoRange.getValues(),
     filteredLogs;
 
-  Logger.log(value);
-
-  // simple logic to validate the input
-  if (value.includes("https://dps.report/")) {
-    inputIsValid = true;
-  } else {
-    if (value == "") {
-      inputIsEmpty = true;
-    } else {
-      inputIsValid = false;
-    }
+  if (value == "") {
+    inputIsEmpty = true;
   }
-
   if (
     e &&
     e.range &&
@@ -55,28 +46,46 @@ function editTrigger(e) {
     e.range.getSheet().getName() === "Settings" &&
     !inputIsEmpty
   ) {
-    if (inputIsValid) {
-      statusCell.setValue("Calculating Logs");
-      formatedLogs = formatLogs(value);
-      Logger.log(formatedLogs);
-      filteredLogs = preFilterLogs(formatedLogs);
-      if (filteredLogs.length > 0) {
-        writeDataIntoSpreadsheet(filteredLogs);
-        repairSettingsLayout();
-        statusCell.setValue("Calculation complete");
-      } else {
-        repairSettingsLayout();
-        statusCell.setValue("Nothing to Do, Check the Info Box");
-      }
+    // simple logic to validate the input
+    if (value.includes("https://dps.report/")) {
+      inputIsValid = true;
     } else {
-      statusCell.setValue(
-        "Wrong records found, check the entries or contact an admin"
-      );
+      inputIsValid = false;
     }
-    var amountOfPlayers = fillAllPlayersAccName(),
-      amountOfDays = fillFailedPhases();
-    updateStatisticsLayout(amountOfPlayers, amountOfDays);
-    mechanicSheet.getRange(41, 1, 1, 1).setValues([["Available!"]]);
+
+    if (!playersToView || players.filter((e) => e[0]).length != playersToView) {
+      infoValue[0][0] =
+        "Players in Setup & Co don't match amount of players to view, fill missing players and try again";
+      infoRange.setValues(infoValue);
+      console.log(players);
+    } else {
+      if (inputIsValid) {
+        statusCell.setValue("Calculating Logs");
+        formatedLogs = formatLogs(value);
+        Logger.log(formatedLogs);
+        filteredLogs = preFilterLogs(formatedLogs);
+        if (filteredLogs.length > 0) {
+          writeDataIntoSpreadsheet(filteredLogs);
+          statisticsSheet
+            .getRange(9, 7, statisticsSheet.getMaxRows() - 9, 15)
+            .clear();
+          repairSettingsLayout();
+          rebuildFilter();
+          statusCell.setValue("Calculation complete");
+        } else {
+          repairSettingsLayout();
+          statusCell.setValue("Nothing to Do, Check the Info Box");
+        }
+      } else {
+        statusCell.setValue(
+          "Wrong records found, check the entries or contact an admin/developer"
+        );
+      }
+      var amountOfPlayers = fillAllPlayersAccName(),
+        amountOfDays = fillFailedPhases();
+      updateStatisticsLayout(amountOfPlayers, amountOfDays);
+      mechanicSheet.getRange(41, 1, 1, 1).setValues([["Available!"]]);
+    }
   }
 }
 

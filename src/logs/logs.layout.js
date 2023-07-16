@@ -77,3 +77,52 @@ function createLogsLayout() {
   logSheet.hideColumns(19, 6);
   logSheet.hideColumns(27);
 }
+
+function rebuildFilter() {
+  var startRow = 2, // Assuming the data starts from row 2
+    startColumn = 1, // Assuming the data starts from column 1 (A)
+    lastRow = logSheet.getLastRow(),
+    lastColumn = logSheet.getLastColumn(),
+    range = logSheet.getRange(
+      startRow,
+      startColumn,
+      lastRow - startRow + 1,
+      lastColumn
+    ),
+    filter = logSheet.getFilter(),
+    criteria = [];
+
+  // Store the filter criteria before removing the filter
+  if (filter) {
+    var numColumns = range.getNumColumns();
+    for (var col = 1; col <= numColumns; col++) {
+      criteria.push(filter.getColumnFilterCriteria(col));
+    }
+  }
+
+  // Remove the filter
+  if (filter) {
+    filter.remove();
+  }
+
+  // Sort the data
+  range.sort([{ column: 1 }]); // Assuming your dates are in the second column (B)
+
+  // Reapply the filter
+  if (criteria.length > 0) {
+    var newFilterRange = logSheet.getRange(
+      startRow - 1,
+      startColumn,
+      lastRow - startRow + 1,
+      lastColumn
+    );
+    newFilterRange.createFilter();
+    var newFilter = newFilterRange.getFilter();
+    var numColumns = newFilterRange.getNumColumns();
+    for (var col = 1; col <= numColumns; col++) {
+      if (criteria[col - 1]) {
+        newFilter.setColumnFilterCriteria(col, criteria[col - 1]);
+      }
+    }
+  }
+}
