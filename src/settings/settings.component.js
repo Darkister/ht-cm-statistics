@@ -13,6 +13,7 @@ function editPlayersToViewTrigger(e) {
       statusCell = settingsSheet.getRange(13, 3);
 
     updateSetupLayout(playersToView);
+    rebuildMechanics(playersToView);
 
     statusCell.setValue(
       "Updated Players to view to " + playersToView.toString()

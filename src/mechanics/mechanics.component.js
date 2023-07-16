@@ -2,12 +2,12 @@
  *
  */
 function updateMechanics() {
-  var statusRange = mechanicsSheet.getRange(41, 1),
+  var statusRange = mechanicSheet.getRange(41, 1),
     status = statusRange.getValue();
   if (occurrences(status, "in progress ...") == 0) {
-    mechanicsSheet.getRange(41, 1, 1, 1).setValues([["in progress ..."]]);
+    mechanicSheet.getRange(41, 1, 1, 1).setValues([["in progress ..."]]);
     fillMechanics();
-    mechanicsSheet.getRange(41, 1, 1, 1).setValues([["Complete!"]]);
+    mechanicSheet.getRange(41, 1, 1, 1).setValues([["Complete!"]]);
   }
 }
 
@@ -15,7 +15,8 @@ function updateMechanics() {
  *
  */
 function fillMechanics() {
-  var mechanicsRange = mechanicSheet.getRange(1, 2, 37, 30),
+  var playersToView = settingsSheet.getRange(2, 3).getValue(),
+    mechanicsRange = mechanicSheet.getRange(1, 2, 37, playersToView * 3),
     mechanicsValue = mechanicsRange.getValues(),
     avgFailsMinPhases = [
       "Jormag",
@@ -32,7 +33,7 @@ function fillMechanics() {
 
   for (var j = 0; j < 3; j++) {
     var days = j == 0 ? -1 : j == 1 ? 4 : 1;
-    for (var i = 0; i < 10; i++) {
+    for (var i = 0; i < playersToView; i++) {
       var player = mechanicsValue[0 + j * 13][0 + i * 3];
       for (var n = 0; n <= mechanicsToCheck.length; n++) {
         mechanicsValue[n + 2 + j * 13][1 + i * 3] = getAmountOfMechanicFailes(
@@ -63,12 +64,17 @@ function fillMechanics() {
               : "-";
           value++;
         }
-        mechanicsSheet
+        mechanicSheet
           .getRange(41, 1, 1, 1)
           .setValues([
             [
               "in progress ... " +
-                String(+(Math.round((value / 720) * 100 + "e+2") + "e-2")) +
+                String(
+                  +(
+                    Math.round((value / (72 * playersToView)) * 100 + "e+2") +
+                    "e-2"
+                  )
+                ) +
                 " %",
             ],
           ]);

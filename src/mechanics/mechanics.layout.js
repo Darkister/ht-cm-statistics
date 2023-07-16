@@ -8,7 +8,7 @@ function createMechanicsLayout(players = 10) {
     mechanicSheet = ss.getSheetByName("Mechanics");
   }
 
-  while (mechanicSheet.getMaxColumns() < 31) {
+  while (mechanicSheet.getMaxColumns() < 3 * players + 1) {
     mechanicSheet.insertColumns(mechanicSheet.getMaxColumns(), 1);
   }
   mechanicSheet.getRange(40, 1, 1, 1).setValues([["Update Status:"]]);
@@ -150,4 +150,13 @@ function createMechanicsLayout(players = 10) {
     .setFrozenColumns(1);
 }
 
-function rebuildMechanics() {}
+function rebuildMechanics(playersToView) {
+  var range = mechanicSheet.getRange(
+    1,
+    2,
+    mechanicSheet.getLastRow(),
+    mechanicSheet.getLastColumn() - 1
+  );
+  range.clearContent().clearFormat().clearDataValidations();
+  createMechanicsLayout(playersToView);
+}
