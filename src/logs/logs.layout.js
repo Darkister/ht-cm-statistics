@@ -79,8 +79,8 @@ function createLogsLayout() {
 }
 
 function rebuildFilter() {
-  var startRow = 2, // Assuming the data starts from row 2
-    startColumn = 1, // Assuming the data starts from column 1 (A)
+  var startRow = 2,
+    startColumn = 1,
     lastRow = logSheet.getLastRow(),
     lastColumn = logSheet.getLastColumn(),
     range = logSheet.getRange(
@@ -106,14 +106,14 @@ function rebuildFilter() {
   }
 
   // Sort the data
-  range.sort([{ column: 1 }]); // Assuming your dates are in the second column (B)
+  range.sort([{ column: 1 }]);
 
   // Reapply the filter
   if (criteria.length > 0) {
     var newFilterRange = logSheet.getRange(
       startRow - 1,
       startColumn,
-      lastRow - startRow + 1,
+      lastRow,
       lastColumn
     );
     newFilterRange.createFilter();

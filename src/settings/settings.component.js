@@ -62,8 +62,8 @@ function editTrigger(e) {
       if (inputIsValid) {
         statusCell.setValue("Calculating Logs");
         formatedLogs = formatLogs(value);
-        Logger.log(formatedLogs);
         filteredLogs = preFilterLogs(formatedLogs);
+        Logger.log(filteredLogs);
         if (filteredLogs.length > 0) {
           writeDataIntoSpreadsheet(filteredLogs);
           statisticsSheet
@@ -127,7 +127,6 @@ function preFilterLogs(logsInput) {
     calculatedLogs = logSheet
       .getRange(2, 2, logSheet.getLastRow() - 1, 1)
       .getValues();
-    Logger.log(calculatedLogs);
     for (i = 0; i < logsInput.length; i++) {
       if (calculatedLogs.some((arr) => arr.includes(logsInput[i]))) {
         outfilteredLogs.push(logsInput[i]);
