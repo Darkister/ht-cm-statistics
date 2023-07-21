@@ -60,7 +60,8 @@ function createSettingsLayout() {
       "black",
       SpreadsheetApp.BorderStyle.SOLID
     )
-    .setBackground(lightGray);
+    .setBackground(lightGray)
+    .setWrapStrategy(SpreadsheetApp.WrapStrategy.WRAP);
   settingsSheet.getRange(3, 8).setVerticalAlignment("top");
 
   settingsValue[12][1] = "Status:";
