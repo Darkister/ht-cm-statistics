@@ -1,7 +1,5 @@
-name: 'HT-CM-Statistics'
+name: "HT-CM-Statistics Release"
 on: [push]
-
-name: Create Release
 jobs:
   build:
     name: Create Release
