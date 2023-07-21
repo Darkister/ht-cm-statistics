@@ -1,6 +1,7 @@
 {
   "dependencies": {
-    "@types/google-apps-script": "^1.0.56"
+    "@types/google-apps-script": "^1.0.56",
+    "uglify-js": "^3.17.4"
   },
   "devDependencies": {
     "eslint": "^8.7.0",
