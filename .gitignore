@@ -46,4 +46,4 @@ node_modules/**
 **/examples/**
 
 # Clasp
-/.clasp.json
+.clasp.json
