@@ -1,0 +1,42 @@
+on:
+  push:
+    tags:
+      - "*"
+name: Create Release
+jobs:
+  build:
+    name: Create Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@master
+      - name: NPM Install
+        run: npm install
+      - name: Build Release
+        run: |
+          cat src/**/*.js | uglifyjs > dist/main.js
+          zip ht-cm-statistics-v${{ github.ref }}.zip ./dist/main.js
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@latest
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body: |
+            Changes in this Release
+            - First Change
+            - Second Change
+          draft: false
+          prerelease: false
+      - name: Upload Release Asset
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./dist/ht-cm-statistics-v${{ github.ref }}.zip
+          asset_name: ht-cm-statistics-v${{ github.ref }}.zip
+          asset_content_type: application/zip
