@@ -20,7 +20,7 @@ jobs:
         run: |
           mkdir dist
           cat src/**/*.js | uglifyjs > dist/main.js
-          zip ht-cm-statistics.zip ./dist/main.js
+          zip ht-cm-statistics.zip ./dist/main.js README.md
       - name: Create Release
         if: startsWith(github.ref, 'refs/tags/')
         id: create_release
