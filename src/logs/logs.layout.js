@@ -59,8 +59,12 @@ function createLogsLayout() {
       true,
       "black",
       SpreadsheetApp.BorderStyle.SOLID_THICK
-    )
-    .createFilter();
+    );
+
+  var filter = logSheet.getFilter();
+  if (!filter) {
+    logRange.createFilter();
+  }
 
   logSheet
     .setColumnWidths(1, 1, 80)
