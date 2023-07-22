@@ -42,7 +42,7 @@ function createSettingsLayout() {
       true,
       true,
       "black",
-      SpreadsheetApp.BorderStyle.SOLID
+      SpreadsheetApp.BorderStyle.SOLID,
     )
     .setBackground(lightGray);
   settingsSheet.getRange(4, 3).setVerticalAlignment("top");
@@ -58,7 +58,7 @@ function createSettingsLayout() {
       true,
       true,
       "black",
-      SpreadsheetApp.BorderStyle.SOLID
+      SpreadsheetApp.BorderStyle.SOLID,
     )
     .setBackground(lightGray)
     .setWrapStrategy(SpreadsheetApp.WrapStrategy.WRAP);
@@ -105,7 +105,7 @@ function repairSettingsLayout() {
       true,
       true,
       "black",
-      SpreadsheetApp.BorderStyle.SOLID
+      SpreadsheetApp.BorderStyle.SOLID,
     )
     .setBackground(lightGray)
     .clearContent();

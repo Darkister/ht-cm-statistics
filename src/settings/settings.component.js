@@ -16,7 +16,7 @@ function editPlayersToViewTrigger(e) {
     rebuildMechanics(playersToView);
 
     statusCell.setValue(
-      "Updated Players to view to " + playersToView.toString()
+      "Updated Players to view to " + playersToView.toString(),
     );
   }
 }
@@ -79,7 +79,7 @@ function editTrigger(e) {
         }
       } else {
         statusCell.setValue(
-          "Wrong records found, check the entries or contact an admin/developer"
+          "Wrong records found, check the entries or contact an admin/developer",
         );
       }
       var amountOfPlayers = fillAllPlayersAccName(),
@@ -110,7 +110,7 @@ function formatLogs(logsInput) {
     infoValue = infoRange.getValues();
 
   var clearLogs = logs.filter(
-    (value) => !(value == [] || value == "" || value == {})
+    (value) => !(value == [] || value == "" || value == {}),
   );
   infoValue[0][0] = "Received Logs: " + clearLogs;
   infoRange.setValues(infoValue);

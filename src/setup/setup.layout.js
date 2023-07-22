@@ -51,7 +51,7 @@ function createSetupLayout() {
       true,
       true,
       "black",
-      SpreadsheetApp.BorderStyle.SOLID_THICK
+      SpreadsheetApp.BorderStyle.SOLID_THICK,
     )
     .setBackground("#ABABAB");
   staticSheet
@@ -64,7 +64,7 @@ function createSetupLayout() {
       true,
       false,
       "black",
-      SpreadsheetApp.BorderStyle.SOLID_THICK
+      SpreadsheetApp.BorderStyle.SOLID_THICK,
     );
   staticSheet
     .getRange(7, 1, 5, 15)
@@ -76,7 +76,7 @@ function createSetupLayout() {
       true,
       false,
       "black",
-      SpreadsheetApp.BorderStyle.SOLID_THICK
+      SpreadsheetApp.BorderStyle.SOLID_THICK,
     );
   staticSheet
     .autoResizeColumn(1)
@@ -129,7 +129,7 @@ function updateSetupLayout(amountOfPlayersToView) {
         true,
         false,
         "black",
-        SpreadsheetApp.BorderStyle.SOLID_THICK
+        SpreadsheetApp.BorderStyle.SOLID_THICK,
       );
   } else if (amountOfPlayersToView <= 10) {
     staticValue[1][0] = "1";
@@ -145,7 +145,7 @@ function updateSetupLayout(amountOfPlayersToView) {
         true,
         false,
         "black",
-        SpreadsheetApp.BorderStyle.SOLID_THICK
+        SpreadsheetApp.BorderStyle.SOLID_THICK,
       );
     staticSheet.getRange(7, 1, amountOfPlayersToView - 5, 1).mergeVertically();
     staticSheet
@@ -158,7 +158,7 @@ function updateSetupLayout(amountOfPlayersToView) {
         true,
         false,
         "black",
-        SpreadsheetApp.BorderStyle.SOLID_THICK
+        SpreadsheetApp.BorderStyle.SOLID_THICK,
       );
   } else {
     staticValue[1][0] = "1";
@@ -175,7 +175,7 @@ function updateSetupLayout(amountOfPlayersToView) {
         true,
         false,
         "black",
-        SpreadsheetApp.BorderStyle.SOLID_THICK
+        SpreadsheetApp.BorderStyle.SOLID_THICK,
       );
     staticSheet.getRange(7, 1, 5, 1).mergeVertically();
     staticSheet
@@ -188,7 +188,7 @@ function updateSetupLayout(amountOfPlayersToView) {
         true,
         false,
         "black",
-        SpreadsheetApp.BorderStyle.SOLID_THICK
+        SpreadsheetApp.BorderStyle.SOLID_THICK,
       );
     staticSheet
       .getRange(12, 1, amountOfPlayersToView - 10, 1)
@@ -203,7 +203,7 @@ function updateSetupLayout(amountOfPlayersToView) {
         true,
         false,
         "black",
-        SpreadsheetApp.BorderStyle.SOLID_THICK
+        SpreadsheetApp.BorderStyle.SOLID_THICK,
       );
   }
 
@@ -224,13 +224,13 @@ function clearSetupLayoutAfterRow(row) {
       row,
       1,
       staticSheet.getMaxRows() - row,
-      15
+      15,
     ),
     staticRangeToClearText = staticSheet.getRange(
       row,
       1,
       staticSheet.getMaxRows() - row,
-      4
+      4,
     );
 
   staticRangeToClearText.clear();

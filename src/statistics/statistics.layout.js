@@ -77,7 +77,7 @@ function createStatisticsLayout() {
       true,
       true,
       "black",
-      SpreadsheetApp.BorderStyle.SOLID_THICK
+      SpreadsheetApp.BorderStyle.SOLID_THICK,
     );
   statisticsSheet
     .getRange(7, 7, 2, 15)
@@ -89,7 +89,7 @@ function createStatisticsLayout() {
       true,
       true,
       "black",
-      SpreadsheetApp.BorderStyle.SOLID_THICK
+      SpreadsheetApp.BorderStyle.SOLID_THICK,
     );
   statisticsSheet.getRange(7, 1, 1, 5).setBackground("#ABABAB");
   statisticsSheet.getRange(7, 7, 1, 15).setBackground("#ABABAB");
@@ -111,7 +111,7 @@ function cleanUpStatisticsLayout() {
       9,
       1,
       statisticsSheet.getLastRow() - 8,
-      5
+      5,
     ),
     statisticsValue = statisticsRange.getValues();
 
@@ -133,7 +133,7 @@ function cleanUpStatisticsLayout() {
       null,
       null,
       "black",
-      SpreadsheetApp.BorderStyle.SOLID_THICK
+      SpreadsheetApp.BorderStyle.SOLID_THICK,
     );
 }
 
@@ -152,7 +152,7 @@ function updateStatisticsLayout(amountOfPlayers, amountOfDays) {
       null,
       null,
       "black",
-      SpreadsheetApp.BorderStyle.SOLID_THICK
+      SpreadsheetApp.BorderStyle.SOLID_THICK,
     );
   statisticsSheet
     .getRange(9, 3, amountOfPlayers, 1)
@@ -164,7 +164,7 @@ function updateStatisticsLayout(amountOfPlayers, amountOfDays) {
       null,
       null,
       "black",
-      SpreadsheetApp.BorderStyle.SOLID_THICK
+      SpreadsheetApp.BorderStyle.SOLID_THICK,
     );
   statisticsSheet.getRange(9, 2, amountOfPlayers, 1).setNumberFormat("#,##0");
   statisticsSheet.getRange(9, 3, amountOfPlayers, 1).setNumberFormat("#0.00%");
@@ -176,7 +176,7 @@ function updateStatisticsLayout(amountOfPlayers, amountOfDays) {
     .setGradientMidpointWithValue(
       "#FFFF00",
       SpreadsheetApp.InterpolationType.PERCENTILE,
-      "50"
+      "50",
     )
     .setGradientMinpoint("#FF0000")
     .setRanges([statisticsSheet.getRange(9, 3, amountOfPlayers, 1)])
@@ -186,7 +186,7 @@ function updateStatisticsLayout(amountOfPlayers, amountOfDays) {
     .setGradientMidpointWithValue(
       "#FFFF00",
       SpreadsheetApp.InterpolationType.PERCENTILE,
-      "50"
+      "50",
     )
     .setGradientMinpoint("#008B00")
     .setRanges([statisticsSheet.getRange(9, 5, amountOfPlayers, 1)])
@@ -206,7 +206,7 @@ function updateStatisticsLayout(amountOfPlayers, amountOfDays) {
       true,
       true,
       "black",
-      SpreadsheetApp.BorderStyle.SOLID_THICK
+      SpreadsheetApp.BorderStyle.SOLID_THICK,
     )
     .setFontWeight("bold");
   statisticsSheet
@@ -224,12 +224,12 @@ function updateStatisticsLayout(amountOfPlayers, amountOfDays) {
       true,
       true,
       "black",
-      SpreadsheetApp.BorderStyle.SOLID_THICK
+      SpreadsheetApp.BorderStyle.SOLID_THICK,
     );
 
   for (var i = 0; i < amountOfDays; i++) {
     var values = removeEndingZeros(
-      statisticsSheet.getRange(9 + i, 8, 1, 10).getValues()[0]
+      statisticsSheet.getRange(9 + i, 8, 1, 10).getValues()[0],
     );
 
     var rule = SpreadsheetApp.newConditionalFormatRule()
@@ -237,7 +237,7 @@ function updateStatisticsLayout(amountOfPlayers, amountOfDays) {
       .setGradientMidpointWithValue(
         "#FFFF00",
         SpreadsheetApp.InterpolationType.PERCENT,
-        "50"
+        "50",
       )
       .setGradientMinpoint("#008B00")
       .setRanges([statisticsSheet.getRange(9 + i, 8, 1, values.length)])
@@ -252,7 +252,7 @@ function updateStatisticsLayout(amountOfPlayers, amountOfDays) {
       .setGradientMidpointWithValue(
         "#FFFF00",
         SpreadsheetApp.InterpolationType.PERCENT,
-        "50"
+        "50",
       )
       .setGradientMinpoint("#008B00")
       .setRanges([statisticsSheet.getRange(10, 19 + j, amountOfDays - 1, 1)])

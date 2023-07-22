@@ -58,7 +58,7 @@ function createLogsLayout() {
       true,
       true,
       "black",
-      SpreadsheetApp.BorderStyle.SOLID_THICK
+      SpreadsheetApp.BorderStyle.SOLID_THICK,
     );
 
   var filter = logSheet.getFilter();
@@ -91,7 +91,7 @@ function rebuildFilter() {
       startRow,
       startColumn,
       lastRow - startRow + 1,
-      lastColumn
+      lastColumn,
     ),
     filter = logSheet.getFilter(),
     criteria = [];
@@ -118,7 +118,7 @@ function rebuildFilter() {
       startRow - 1,
       startColumn,
       lastRow,
-      lastColumn
+      lastColumn,
     );
     newFilterRange.createFilter();
     var newFilter = newFilterRange.getFilter();

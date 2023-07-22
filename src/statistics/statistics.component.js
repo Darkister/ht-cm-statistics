@@ -108,7 +108,7 @@ function fillAllPlayersAccName() {
       "=COUNTIF(Logs!H2:Q;A" + (a + 9) + ")",
       "=B" + (a + 9) + "/A8",
       "=COUNTIFS(Logs!G2:G;A" + (a + 9) + ";Logs!Y2:Y;FALSE;Logs!R2:R;FALSE)",
-      "=D" + (a + 9) + "/B" + (a + 9)
+      "=D" + (a + 9) + "/B" + (a + 9),
     );
   }
 
@@ -126,7 +126,7 @@ function fillAllPlayersAccName() {
       null,
       null,
       "black",
-      SpreadsheetApp.BorderStyle.SOLID_THICK
+      SpreadsheetApp.BorderStyle.SOLID_THICK,
     );
   statisticsSheet
     .getRange(9, 1, amountOfPlayersToView, 5)
@@ -138,7 +138,7 @@ function fillAllPlayersAccName() {
       null,
       null,
       "black",
-      SpreadsheetApp.BorderStyle.SOLID_THICK
+      SpreadsheetApp.BorderStyle.SOLID_THICK,
     );
   return allPlayers.size;
 }
@@ -184,7 +184,7 @@ function fillFailedPhases() {
     "=SUM(R10:R)",
     "=SUM(S10:S)",
     "=SUM(T10:T)",
-    "=SUM(U10:U)"
+    "=SUM(U10:U)",
   );
 
   for (var i = 1; i < logValues.length; i++) {
@@ -246,7 +246,7 @@ function fillFailedPhases() {
             ")",
           greenFailes,
           slamFailes,
-          shwaveFailes
+          shwaveFailes,
         );
         jorFailes =
           priFailes =
@@ -268,7 +268,7 @@ function fillFailedPhases() {
         9,
         7,
         statisticsValues.length,
-        statisticsSheet.getLastColumn() - 6
+        statisticsSheet.getLastColumn() - 6,
       );
       statisticsValues[currentRow].push(
         jorFailes,
@@ -284,7 +284,7 @@ function fillFailedPhases() {
         "=SUM(H" + String(currentRow + 9) + ":Q" + String(currentRow + 9) + ")",
         greenFailes,
         slamFailes,
-        shwaveFailes
+        shwaveFailes,
       );
       Logger.log(statisticsValues);
       statisticsRange
@@ -302,7 +302,7 @@ function fillFailedPhases() {
           null,
           null,
           "black",
-          SpreadsheetApp.BorderStyle.SOLID_THICK
+          SpreadsheetApp.BorderStyle.SOLID_THICK,
         );
       return statisticsValues.length;
     }

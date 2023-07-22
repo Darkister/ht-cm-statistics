@@ -50,7 +50,7 @@ function writeDataIntoSpreadsheet(logs) {
       true,
       null,
       "black",
-      SpreadsheetApp.BorderStyle.SOLID
+      SpreadsheetApp.BorderStyle.SOLID,
     )
     .setFontWeight("normal")
     .setFontFamily("Arial")
@@ -73,7 +73,7 @@ function apiFetch(permalink) {
     },
     data = UrlFetchApp.fetch(
       "https://dps.report/getJson?permalink=" + permalink,
-      opt
+      opt,
     );
 
   data = data.getContentText();

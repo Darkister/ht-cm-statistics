@@ -41,13 +41,13 @@ function fillMechanics() {
             .getRange(2, n + 19, logSheet.getLastRow() - 1, 1)
             .getValues(),
           player,
-          days
+          days,
         );
         mechanicsValue[n + 2 + j * 13][0 + i * 3] = avgFailsPerTry(
           player,
           mechanicsValue[n + 2 + j * 13][1 + i * 3],
           avgFailsMinPhases[n],
-          days
+          days,
         );
         value += 2;
         if (j > 0) {
@@ -73,7 +73,7 @@ function fillMechanics() {
                   +(
                     Math.round((value / (72 * playersToView)) * 100 + "e+2") +
                     "e-2"
-                  )
+                  ),
                 ) +
                 " %",
             ],
@@ -167,7 +167,7 @@ function avgFailsPerTry(player, totalValue, phase, days = -1) {
 
   if (days == -1) {
     var filteredRows = phases.filter(
-      (row, i) => allowedPhases.includes(row[0]) && players[i].includes(player)
+      (row, i) => allowedPhases.includes(row[0]) && players[i].includes(player),
     );
     counter = filteredRows.length;
   } else {
