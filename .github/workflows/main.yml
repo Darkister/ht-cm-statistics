@@ -18,7 +18,6 @@ jobs:
         run: npm install uglify-js -g
       - name: Build Release
         run: |
-          mkdir dist
           cat src/**/*.js | uglifyjs > main.js
           zip ht-cm-statistics.zip main.js README.md
       - name: Create Release
