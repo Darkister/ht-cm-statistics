@@ -42,7 +42,7 @@ function createMechanicsLayout(players = 10) {
           true,
           true,
           "black",
-          SpreadsheetApp.BorderStyle.SOLID
+          SpreadsheetApp.BorderStyle.SOLID,
         );
       mechanicSheet
         .getRange(1 + j * 13, 2 + i * 3, 11, 3)
@@ -54,7 +54,7 @@ function createMechanicsLayout(players = 10) {
           null,
           null,
           "black",
-          SpreadsheetApp.BorderStyle.SOLID
+          SpreadsheetApp.BorderStyle.SOLID,
         );
       mechanicSheet
         .getRange(3 + j * 13, 2 + i * 3, 9, 1)
@@ -84,7 +84,7 @@ function createMechanicsLayout(players = 10) {
         true,
         true,
         "black",
-        SpreadsheetApp.BorderStyle.SOLID
+        SpreadsheetApp.BorderStyle.SOLID,
       );
 
     for (var r = 0; r < 9; r++) {
@@ -106,7 +106,7 @@ function createMechanicsLayout(players = 10) {
         .setGradientMidpointWithValue(
           "#FFFF00",
           SpreadsheetApp.InterpolationType.PERCENTILE,
-          "50"
+          "50",
         )
         .setGradientMinpoint("#008B00")
         .setRanges(ranges)
@@ -148,6 +148,33 @@ function createMechanicsLayout(players = 10) {
     .autoResizeColumns(1, 1)
     .setColumnWidths(2, 30, 50)
     .setFrozenColumns(1);
+
+  var cellPosition = "A43",
+    imageUrl = mechanics_button_url,
+    images = mechanicSheet.getImages(),
+    isImageExisting = false;
+
+  for (var i = 0; i < images.length; i++) {
+    var image = images[i];
+    if (image.getAltTextTitle() === "mechanics_button") {
+      isImageExisting = true;
+      break;
+    }
+  }
+
+  if (isImageExisting) {
+    Logger.log("The image exists in the sheet.");
+  } else {
+    var image = UrlFetchApp.fetch(imageUrl),
+      mechanic_button = mechanicSheet.insertImage(
+        image,
+        mechanicSheet.getRange(cellPosition).getColumn(),
+        mechanicSheet.getRange(cellPosition).getRow(),
+      );
+    mechanic_button
+      .assignScript("updateMechanics")
+      .setAltTextTitle("mechanics_button");
+  }
 }
 
 function rebuildMechanics(playersToView) {
@@ -155,7 +182,7 @@ function rebuildMechanics(playersToView) {
     1,
     2,
     mechanicSheet.getLastRow(),
-    mechanicSheet.getLastColumn() - 1
+    mechanicSheet.getLastColumn() - 1,
   );
   range.clearContent().clearFormat().clearDataValidations();
   createMechanicsLayout(playersToView);
