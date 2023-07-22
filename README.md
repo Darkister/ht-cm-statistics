@@ -6,7 +6,7 @@ This script ist made for Google Spreadsheets, to help you and your static to ana
 ### Get the Script into a google Spreadsheet
 1. Download the latest stable ht-cm-statistics.zip here: [Releases](https://github.com/Darkister/ht-cm-statistics/releases)
 2. Unzip the Zip-File
-3. Open the unziped folder and navigate through it. There is the File 'main.js' inside the folder "dist"
+3. Open the unziped folder and navigate through it. There is the File 'main.js'.
 4. Open the File 'main.js' in any editor of your choice. Simple Notepad is absolutly fine
 5. Visit [Google Spreadsheets](https://docs.google.com/spreadsheets/) and if not logged in already, login to your google account
 6. Create a new empty spreadsheet
