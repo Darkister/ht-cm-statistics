@@ -91,6 +91,21 @@ function createSettingsLayout() {
     .setUnprotectedRanges([amountOfPlayersToValidateCell, enterLogRange])
     .setDescription("Protect whole sheet expect the Cell to enter Logs")
     .addEditor(me);
+
+  var triggers = ScriptApp.getProjectTriggers();
+  if(!triggers.some((trigger) => trigger.getHandlerFunction() == "editPlayersToViewTrigger")){
+    ScriptApp.newTrigger("editPlayersToViewTrigger")
+    .forSpreadsheet(ss)
+    .onEdit()
+    .create();
+  }
+
+  if(!triggers.some((trigger) => trigger.getHandlerFunction() == "editTrigger")){
+    ScriptApp.newTrigger("editTrigger")
+    .forSpreadsheet(ss)
+    .onEdit()
+    .create();
+  }
 }
 
 function repairSettingsLayout() {

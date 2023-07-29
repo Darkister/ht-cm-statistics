@@ -23,15 +23,6 @@ This script ist made for Google Spreadsheets, to help you and your static to ana
 
 Now have a look at your Spreadsheet, the basic layout should be created now.
 
-Before you can start upload Logs, swap back to your script tab. On the left side mouse over the clock, you should see a menu now and one is called "Trigger":
-1. Click on "Trigger" and on bottom right corner there should be a Button "Add Trigger" -> click on the Button
-2. select the function 'editTrigger' in the first drop down
-3. leave drop-down 2 and 3 as it is
-4. on the last dropdown select "Bei Änderung" ("On Edit")
-5. The right drop-down is just for notification, choose weekly or just ignore it
-6. Save and verify Permission things like in the Step before.
-Repeat step 1-6 for the function 'editPlayersToViewTrigger'
-
 You should be done, Happy logging.
 
 ## How to use for developer
