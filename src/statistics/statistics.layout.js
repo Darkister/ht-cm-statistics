@@ -101,6 +101,21 @@ function createStatisticsLayout() {
     .autoResizeColumns(8, 11)
     .setColumnWidths(19, 1, 50)
     .autoResizeColumns(20, 2);
+
+  if (statisticsSheet.getLastRow() < 40) {
+    statisticsSheet.deleteRows(40, statisticsSheet.getMaxRows() - 40);
+  }
+  if (statisticsSheet.getLastColumn() < 22) {
+    statisticsSheet.deleteColumns(23, statisticsSheet.getMaxColumns() - 22);
+  }
+
+  var statisticsProtection = statisticsSheet.protect(),
+    me = Session.getEffectiveUser();
+
+  statisticsProtection
+    .removeEditors(statisticsProtection.getEditors())
+    .setDescription("Protect whole sheet expect the Cell to enter Logs")
+    .addEditor(me);
 }
 
 /** create basic layout for the Tab Statistics
@@ -140,6 +155,12 @@ function cleanUpStatisticsLayout() {
 /** Get the failed Phases and fill it into the Statisticsheet
  */
 function updateStatisticsLayout(amountOfPlayers, amountOfDays) {
+  if(amountOfPlayers > statisticsSheet.getMaxRows() - 10){
+    statisticsSheet.insertRowsAfter(statisticsSheet.getMaxRows(), amountOfPlayers - (statisticsSheet.getMaxRows() - 10))
+  }
+  if(amountOfDays > statisticsSheet.getMaxRows() - 10){
+    statisticsSheet.insertRowsAfter(statisticsSheet.getMaxRows(), amountOfDays - (statisticsSheet.getMaxRows() - 10))
+  }
   var rules = new Array();
   // Layout settings for the list of players including the Participation and first Deaths
   statisticsSheet
