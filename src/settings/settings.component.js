@@ -1,3 +1,26 @@
+/** Checks github for the latest version
+ * @return {String} returns an information for the User, that he uses the latest version or not
+ * @customfunction
+ */
+function checkForNewerVersion() {
+  var opt = {
+      contentType: "application/json",
+      muteHttpExceptions: true,
+    },
+    data = UrlFetchApp.fetch(
+      "https://api.github.com/repos/Darkister/ht-cm-statistics/releases/latest",
+      opt,
+    );
+  data = JSON.parse(data.getContentText());
+
+  Logger.log(data.tag_name);
+  if (data.tag_name == scriptVersion) {
+    return "You are using the latest Version :)";
+  } else {
+    return "A newer Version is available!";
+  }
+}
+
 /** Trigger to change the Players to view in Setup and Co
  *  @param {*} e
  */

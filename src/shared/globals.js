@@ -1,4 +1,5 @@
-var targetValues = [
+var scriptVersion = "0.1.4",
+  targetValues = [
     "Heart 1",
     "The JormagVoid",
     "The PrimordusVoid",

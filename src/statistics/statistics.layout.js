@@ -102,10 +102,13 @@ function createStatisticsLayout() {
     .setColumnWidths(19, 1, 50)
     .autoResizeColumns(20, 2);
 
-  if (statisticsSheet.getLastRow() < 40) {
+  if (statisticsSheet.getLastRow() < 40 && statisticsSheet.getMaxRows() != 40) {
     statisticsSheet.deleteRows(40, statisticsSheet.getMaxRows() - 40);
   }
-  if (statisticsSheet.getLastColumn() < 22) {
+  if (
+    statisticsSheet.getLastColumn() < 22 &&
+    statisticsSheet.getMaxColumns() != 22
+  ) {
     statisticsSheet.deleteColumns(23, statisticsSheet.getMaxColumns() - 22);
   }
 
@@ -155,11 +158,17 @@ function cleanUpStatisticsLayout() {
 /** Get the failed Phases and fill it into the Statisticsheet
  */
 function updateStatisticsLayout(amountOfPlayers, amountOfDays) {
-  if(amountOfPlayers > statisticsSheet.getMaxRows() - 10){
-    statisticsSheet.insertRowsAfter(statisticsSheet.getMaxRows(), amountOfPlayers - (statisticsSheet.getMaxRows() - 10))
+  if (amountOfPlayers > statisticsSheet.getMaxRows() - 10) {
+    statisticsSheet.insertRowsAfter(
+      statisticsSheet.getMaxRows(),
+      amountOfPlayers - (statisticsSheet.getMaxRows() - 10),
+    );
   }
-  if(amountOfDays > statisticsSheet.getMaxRows() - 10){
-    statisticsSheet.insertRowsAfter(statisticsSheet.getMaxRows(), amountOfDays - (statisticsSheet.getMaxRows() - 10))
+  if (amountOfDays > statisticsSheet.getMaxRows() - 10) {
+    statisticsSheet.insertRowsAfter(
+      statisticsSheet.getMaxRows(),
+      amountOfDays - (statisticsSheet.getMaxRows() - 10),
+    );
   }
   var rules = new Array();
   // Layout settings for the list of players including the Participation and first Deaths
