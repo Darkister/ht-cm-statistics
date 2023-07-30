@@ -35,6 +35,20 @@ function getBestTry(data) {
   return logs[bestTryCurr][0];
 }
 
+/** Update the Statistics when ever there is a change on the logs sheet
+ * @param {*} e
+ */
+function updateStatisticsTrigger(e) {
+  if (e && e.source && (e.changeType === "REMOVE_ROW" || e.changeType === "OTHER")){
+    statisticsSheet
+      .getRange(9, 7, statisticsSheet.getMaxRows() - 9, 15)
+      .clear();
+    var amountOfPlayers = fillAllPlayersAccName(),
+      amountOfDays = fillFailedPhases();
+    updateStatisticsLayout(amountOfPlayers, amountOfDays);
+  }
+}
+
 /** Get info that players failed a given mechanic
  *  @param {String} json      fightData as json of the Encounter
  *  @param {String} mechanic  the name of the mechanic

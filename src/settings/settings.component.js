@@ -105,9 +105,6 @@ function editTrigger(e) {
           "Wrong records found, check the entries or contact an admin/developer",
         );
       }
-      var amountOfPlayers = fillAllPlayersAccName(),
-        amountOfDays = fillFailedPhases();
-      updateStatisticsLayout(amountOfPlayers, amountOfDays);
       mechanicSheet.getRange(41, 1, 1, 1).setValues([["Available!"]]);
     }
   }

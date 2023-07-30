@@ -119,6 +119,18 @@ function createStatisticsLayout() {
     .removeEditors(statisticsProtection.getEditors())
     .setDescription("Protect whole sheet expect the Cell to enter Logs")
     .addEditor(me);
+
+  var triggers = ScriptApp.getProjectTriggers();
+  if (
+    !triggers.some(
+      (trigger) => trigger.getHandlerFunction() == "updateStatisticsTrigger",
+    )
+  ) {
+    ScriptApp.newTrigger("updateStatisticsTrigger")
+      .forSpreadsheet(ss)
+      .onChange()
+      .create();
+  }
 }
 
 /** create basic layout for the Tab Statistics
