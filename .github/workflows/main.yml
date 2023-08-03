@@ -7,11 +7,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@master
-      - name: set some vars
-        id: vars
-        run: |
-          calculatedTag=$(git describe --tags --abbrev=0 ${{ github.sha}} 2>/dev/null || true)
-          echo "::set-output name=GIT_TAG::$calculatedTag"
       - name: NPM Install
         run: npm install
       - name: Install uglify
@@ -30,9 +25,7 @@ jobs:
           tag_name: ${{ github.ref }}
           release_name: Release ${{ github.ref }}
           body: |
-            Changes in this Release
-            - First Change
-            - Second Change
+            Changes in this Release:
           draft: false
           prerelease: false
       - name: Upload Release Asset
